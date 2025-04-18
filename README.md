@@ -37,7 +37,9 @@ cd jellyfish-mcp
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-3. Create a virtual environment and install dependencies:
+3. Restart your terminal or open a new terminal window to ensure uv is in your PATH.
+
+4. Create a virtual environment and install dependencies:
 ```bash
 uv venv
 source .venv/bin/activate
@@ -52,12 +54,17 @@ uv pip install .
    - MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
    - Windows: `%AppData%\Claude\claude_desktop_config.json`
 
-2. Add the following configuration (replace paths and token with your values):
+2. Find your uv installation path by running:
+```bash
+which uv
+```
+
+3. Add the following configuration (replace paths and token with your values):
 ```json
 {
   "mcpServers": {
     "jellyfish": {
-      "command": "uv",
+      "command": "/FULL/PATH/TO/uv",
       "args": [
         "--directory",
         "/ABSOLUTE/PATH/TO/jellyfish-mcp",
@@ -71,6 +78,8 @@ uv pip install .
   }
 }
 ```
+
+4. Quit and restart Claude Desktop for the configuration changes to take effect.
 
 ### Running the Server
 
