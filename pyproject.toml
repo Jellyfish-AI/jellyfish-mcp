@@ -1,7 +1,7 @@
 [project]
-name = "mcp-jellyfish"
+name = "jellyfish-mcp"
 version = "0.1.0"
-description = "Add your description here"
+description = "Jellyfish MCP server"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,4 +9,21 @@ dependencies = [
     "mcp[cli]>=1.6.0",
     "pyyaml>=6.0.2",
     "requests>=2.32.3",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-asyncio",
+    "requests-mock"
 ]
