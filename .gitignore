@@ -11,3 +11,6 @@ wheels/
 
 # Local notes
 notes/
+
+# Local settings
+.vscode/settings.json
