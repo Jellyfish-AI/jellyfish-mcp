@@ -34,25 +34,25 @@ api_schema = None
 # Function to fetch and process the schema
 def fetch_schema(ctx: Context):
     global api_schema
-    ctx.log(f"Attempting to fetch schema from: {SCHEMA_URL}")
+    ctx.log("info", f"Attempting to fetch schema from: {SCHEMA_URL}")
 
     try:
         response = requests.get(SCHEMA_URL, headers=HEADERS)
-        ctx.log(f"Response status code: {response.status_code}")
+        ctx.log("info", f"Response status code: {response.status_code}")
 
         if response.status_code == 200:
             api_schema = yaml.safe_load(response.text)
             return True
         else:
-            ctx.log(f"Failed to fetch schema: HTTP {response.status_code}")
-            ctx.log(response.text)
+            ctx.log("info", f"Failed to fetch schema: HTTP {response.status_code}")
+            ctx.log("info", response.text)
             return False
     except yaml.YAMLError as e:
-        ctx.log(f"Failed to parse YAML response: {str(e)}")
-        ctx.log(f"Raw response: {response.text}")
+        ctx.log("info", f"Failed to parse YAML response: {str(e)}")
+        ctx.log("info", f"Raw response: {response.text}")
         return False
     except requests.exceptions.RequestException as e:
-        ctx.log(f"Request failed: {str(e)}")
+        ctx.log("info", f"Request failed: {str(e)}")
         return False
 
 # Initialize server with lifespan
@@ -110,12 +110,12 @@ def get_endpoint(endpoint_path: str, ctx: Context, params: dict = None) -> dict:
     """
     # The endpoint_path from the schema already includes /endpoints/export/v0/
     url = f"{API_BASE_URL}/{endpoint_path.lstrip('/')}"
-    ctx.log(f"\nAttempting API request to: {url}")
-    ctx.log(f"With params: {params}")
+    ctx.log("info", f"\nAttempting API request to: {url}")
+    ctx.log("info", f"With params: {params}")
 
     response = requests.get(url, headers=HEADERS, params=params)
-    ctx.log(f"Response status: {response.status_code}")
-    ctx.log(
+    ctx.log("info", f"Response status: {response.status_code}")
+    ctx.log("info", 
         f"Response text: {response.text[:500]}..."
     )  # Print first 500 chars of response
 
