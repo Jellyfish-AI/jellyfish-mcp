@@ -91,6 +91,40 @@ uv pip install .
 
 ## Usage
 
+### Setup credentials
+
+`jellyfish-mcp` supports two different modes for setting the Jellyfish Export API token.
+
+1. The preferred method is to use `keyring`, which comes with `jellyfish-mcp`. It is
+   the most secure and ensures credentials are stored using your operating system's
+   preferred credential store. Set your token on your system by running the following in your shell:
+
+```bash
+uv run python -m keyring set jellyfish api_token
+```
+
+You will then be prompted to set a password. Paste in your API token from Jellyfish and you're good to go.
+You won't need to do this again.
+
+2. The other option uses environment variables. If you set `JELLYFISH_API_TOKEN` it will be used as the credential. Many MCP clients allow passing through environment variables, so refer to your tool's documentation for best practices. *In general this is less secure, and isn't recommended.*
+
+### Configuration with VSCode + Copilot
+
+1. Open the "Command Palette..."
+2. Search for "MCP: Add Server..." and click it
+3. In the dialog box that appears provide: `</FULL/PATH/TO/u> --directory </ABSOLUTE/PATH/TO/jellyfish-mcp> run server.py`
+4. Give the MCP server a name
+5. Same as part of your user or workspace settings as appropriate.
+6. Restart VSCode
+
+#### Running the Server
+
+When you open VSCode from then on, bringing up the "Chat" window should and turning on "Agent" mode should indicate that many tools have been installed from your MCP server. You can then ask Copilot various questions like:
+
+- "What endpoints are available in the Jellyfish API?"
+- "Can you get a list of my organization's teams?"
+- "Show me the API schema"
+
 ### Configuration with Claude Desktop
 
 1. Create or edit your Claude Desktop configuration file at:
@@ -102,7 +136,7 @@ uv pip install .
 which uv
 ```
 
-3. Add the following configuration (replace paths and token with your values):
+3. Add the following configuration (replace paths with your values):
 ```json
 {
   "mcpServers": {
@@ -112,11 +146,8 @@ which uv
         "--directory",
         "/ABSOLUTE/PATH/TO/jellyfish-mcp",
         "run",
-        "mcp-jf.py"
-      ],
-      "env": {
-        "JELLYFISH_API_TOKEN": "your-api-token-here"
-      }
+        "server.py"
+      ]
     }
   }
 }
@@ -124,7 +155,7 @@ which uv
 
 4. Quit and restart Claude Desktop for the configuration changes to take effect.
 
-### Running the Server
+#### Running the Server
 
 The server will start automatically when you open Claude Desktop with the proper configuration. You can then ask Claude questions about your Jellyfish data, such as:
 - "What endpoints are available in the Jellyfish API?"
@@ -146,4 +177,4 @@ tail -n 20 -f ~/Library/Logs/Claude/mcp*.log
 
 ## License
 
-[Insert here later]
+This code is distributed under the MIT license. See: LICENSE.
