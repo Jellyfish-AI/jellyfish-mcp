@@ -8,7 +8,7 @@ from collections.abc import AsyncIterator
 import os
 
 # API configuration
-API_BASE_URL = "http://localhost:8000" # TODO: Fix 
+API_BASE_URL = "https://app.jellyfish.co"
 SCHEMA_URL = f"{API_BASE_URL}/endpoints/export/v0/schema"  # Specific URL for schema
 
 # Get API token from environment, if available.
