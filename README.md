@@ -8,9 +8,52 @@ A Model Context Protocol server for retrieving and analyzing data from Jellyfish
 
 The server provides several tools for interacting with the Jellyfish API:
 
-1. `get_api_schema` - Retrieves the complete API schema with all available endpoints
-2. `list_endpoints` - Lists all available API endpoints with their descriptions
-3. `get_endpoint` - Makes GET requests to any available API endpoint
+#### General
+
+- `get_api_schema` - Retrieves the complete API schema with all available endpoints
+- `list_endpoints` - Lists all available API endpoints with their descriptions
+- `get_endpoint` - Makes GET requests to any available API endpoint
+
+#### Allocations
+
+- `allocations_by_person`
+- `allocations_by_team`
+- `allocations_by_investment_category`
+- `allocations_by_investment_category_person`
+- `allocations_by_investment_category_team`
+- `allocations_by_work_category`
+- `allocations_by_work_category_person`
+- `allocations_by_work_category_team`
+- `allocations_filter_fields`
+- `allocations_summary_by_investment_category`
+- `allocations_summary_by_work_category`
+
+#### Delivery
+
+- `deliverable_details`
+- `deliverable_scope_and_effort_history`
+- `work_categories`
+- `work_category_contents`
+
+#### Metrics
+
+- `company_metrics`
+- `person_metrics`
+- `team_metrics`
+- `team_sprint_summary`
+- `unlinked_pull_requests`
+
+#### People
+
+- `list_engineers`
+- `search_people`
+
+#### Teams
+
+- `list_teams`
+- `search_teams`
+
+Each tool corresponds to a specific Jellyfish API endpoint and allows you to retrieve or search for data as described in the API.
 
 ## Setup
 

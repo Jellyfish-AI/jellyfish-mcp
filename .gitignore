@@ -8,3 +8,9 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local notes
+notes/
+
+# Local settings
+.vscode/settings.json
