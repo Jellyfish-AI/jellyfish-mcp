@@ -1,0 +1,17 @@
+
+name: Static analysis using semgrep
+on:
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  secrets-detect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+      - name: Install semgrep
+        run: pip install semgrep
+      - name: Run semgrep
+        run: semgrep --config auto --error
+
