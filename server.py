@@ -76,12 +76,12 @@ def get_api_schema() -> str:
 
 # Tool to list all available endpoints
 @mcp.tool()
-def list_endpoints() -> dict:
+def list_endpoints(ctx: Context) -> dict:
     """List all available API endpoints with their descriptions"""
     global api_schema
 
     if api_schema is None:
-        if not fetch_schema():
+        if not fetch_schema(ctx):
             return {"error": "Failed to fetch API schema"}
 
     # Extract endpoint information from schema
