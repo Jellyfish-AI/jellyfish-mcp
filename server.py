@@ -32,44 +32,31 @@ api_schema = None
 
 
 # Function to fetch and process the schema
-def fetch_schema():
+def fetch_schema(ctx: Context):
     global api_schema
-    print(f"Attempting to fetch schema from: {SCHEMA_URL}")
+    ctx.log(f"Attempting to fetch schema from: {SCHEMA_URL}")
 
     try:
         response = requests.get(SCHEMA_URL, headers=HEADERS)
-        print(f"Response status code: {response.status_code}")
+        ctx.log(f"Response status code: {response.status_code}")
 
         if response.status_code == 200:
             api_schema = yaml.safe_load(response.text)
             return True
         else:
-            print(f"Failed to fetch schema: HTTP {response.status_code}")
-            print(response.text)
+            ctx.log(f"Failed to fetch schema: HTTP {response.status_code}")
+            ctx.log(response.text)
             return False
     except yaml.YAMLError as e:
-        print(f"Failed to parse YAML response: {str(e)}")
-        print(f"Raw response: {response.text}")
+        ctx.log(f"Failed to parse YAML response: {str(e)}")
+        ctx.log(f"Raw response: {response.text}")
         return False
     except requests.exceptions.RequestException as e:
-        print(f"Request failed: {str(e)}")
+        ctx.log(f"Request failed: {str(e)}")
         return False
 
-
-@asynccontextmanager
-async def server_lifespan(server: FastMCP) -> AsyncIterator[None]:
-    """Fetch API schema during server startup"""
-    print("Starting Jellyfish API MCP Server...")
-    fetch_schema()
-    try:
-        yield
-    finally:
-        print("Shutting down Jellyfish API MCP Server...")
-
-
 # Initialize server with lifespan
-mcp = FastMCP("Jellyfish API Server", lifespan=server_lifespan)
-
+mcp = FastMCP("Jellyfish API Server")
 
 # Resource to get the API schema
 @mcp.resource("schema://api")
@@ -78,7 +65,7 @@ def get_api_schema() -> str:
     global api_schema
 
     if api_schema is None:
-        fetch_schema()
+        fetch_schema(mcp.get_context())
 
     if api_schema:
         # Format the schema as a readable string
@@ -113,7 +100,7 @@ def list_endpoints() -> dict:
 
 # Generic tool to make GET requests to any endpoint
 @mcp.tool()
-def get_endpoint(endpoint_path: str, params: dict = None) -> dict:
+def get_endpoint(endpoint_path: str, ctx: Context, params: dict = None) -> dict:
     """
     Make a GET request to any API endpoint
 
@@ -123,13 +110,12 @@ def get_endpoint(endpoint_path: str, params: dict = None) -> dict:
     """
     # The endpoint_path from the schema already includes /endpoints/export/v0/
     url = f"{API_BASE_URL}/{endpoint_path.lstrip('/')}"
-    print(f"\nAttempting API request to: {url}")
-    print(f"With headers: {HEADERS}")
-    print(f"With params: {params}")
+    ctx.log(f"\nAttempting API request to: {url}")
+    ctx.log(f"With params: {params}")
 
     response = requests.get(url, headers=HEADERS, params=params)
-    print(f"Response status: {response.status_code}")
-    print(
+    ctx.log(f"Response status: {response.status_code}")
+    ctx.log(
         f"Response text: {response.text[:500]}..."
     )  # Print first 500 chars of response
 
