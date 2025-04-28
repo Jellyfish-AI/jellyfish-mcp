@@ -17,9 +17,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3
     - name: Install pre-reqs
-      run: pip install --user uv
-    - name: Install dependencies
-      run: uv pip install .
+      run: |
+        pip install --user uv
+        uv venv
+        source .venv/bin/activate
+        uv pip install .
     - name: Endor Labs Scan Pull Request
       if: github.event_name == 'pull_request'
       uses: endorlabs/github-action@v1.1.7
