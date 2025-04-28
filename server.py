@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP, Context
 import requests
+import keyring
 import json
 import yaml  # Add PyYAML for YAML parsing
 from contextlib import asynccontextmanager
@@ -7,16 +8,22 @@ from collections.abc import AsyncIterator
 import os
 
 # API configuration
-API_BASE_URL = "https://app.jellyfish.co"
+API_BASE_URL = "http://localhost:8000" # TODO: Fix 
 SCHEMA_URL = f"{API_BASE_URL}/endpoints/export/v0/schema"  # Specific URL for schema
 
-# Get API token from environment
+# Get API token from environment, if available.
 API_TOKEN = os.getenv("JELLYFISH_API_TOKEN")
 if not API_TOKEN:
-    raise ValueError(
-        "JELLYFISH_API_TOKEN environment variable is not set. "
-        "Please set it in your Claude Desktop config file."
-    )
+    # If not found in environment, try to get it from keyring
+    API_TOKEN = keyring.get_password('jellyfish', 'api_token')
+    if not API_TOKEN:
+        raise ValueError(
+            "No JELLYFISH_API_TOKEN environment variable or jellyfish keyring entry found.\n\n"
+            "Please set the credential in your keyring or as an environment variable.\n"
+            "(Preferred) Set via keyring by running:\n\n"
+            "    uv run python -m keyring set jellyfish api_token\n\n"
+            "Or, set it in your Claude Desktop config file."
+        )
 
 HEADERS = {"Authorization": f"Token {API_TOKEN}"}
 
