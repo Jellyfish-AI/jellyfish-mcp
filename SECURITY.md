@@ -1,5 +1,5 @@
 # Threat Model
-Model Context Protocol is still in its infancy, especially with regards to security. There are inherent risks in its design as there are in `jellyfish-mcp`. We want to be super clear on what security guarentees you can expect from this and what you can not.
+Model Context Protocol is still in its infancy, especially with regards to security. There are inherent risks in its design just as there are in `jellyfish-mcp`. We want to be super clear on what security guarantees you can expect from this and what you can not.
 
 Given the inherent risks, we do not recommend this for daily use.
 
