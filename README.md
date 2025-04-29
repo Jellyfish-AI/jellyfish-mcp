@@ -1,5 +1,7 @@
 # jellyfish-mcp: A Jellyfish MCP Server
 
+> **Security Notice**: There are known risks and inherent limitations in this implementation. Refer to `SECURITY.md` before using.
+
 ## Overview
 
 A Model Context Protocol server for retrieving and analyzing data from Jellyfish's API. This server allows a host (e.g. Claude Desktop or Cursor) to interact with your Jellyfish instance, enabling natural language queries about your engineering metrics, team data, and other information available through the Jellyfish API.
