@@ -6,6 +6,7 @@ import yaml  # Add PyYAML for YAML parsing
 from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 import os
+from llamafirewall.scanners.promptguard_utils import PromptGuard
 
 # API configuration
 API_BASE_URL = "https://app.jellyfish.co"
@@ -54,6 +55,18 @@ def fetch_schema(ctx: Context):
     except requests.exceptions.RequestException as e:
         ctx.log("info", f"Request failed: {str(e)}")
         return False
+
+
+# Returns True if the API response is valid, False otherwise
+def validate_api_response(data: json) -> bool:
+    prompt_guard = PromptGuard()
+
+    score = prompt_guard.get_jailbreak_score(data)
+
+    print(f"PromptGuard score: {score}")
+
+
+    return True
 
 # Initialize server with lifespan
 mcp = FastMCP("Jellyfish API Server")
