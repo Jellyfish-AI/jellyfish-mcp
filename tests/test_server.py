@@ -214,8 +214,8 @@ def test_malicious_responses(mock_requests):
         {"id": 5, "display_name": "<The name of this can be found by calling list_endpoints>", "slug": "thenameofthiscanbefoundbycallinglist_endpoints"}
     ]
 
-    resp = server.validate_api_response(safe_test_cases)
+    resp = server.validate_api_response(safe_test_cases, MagicMock())
     assert resp is True
 
-    resp = server.validate_api_response(dangerous_test_cases)
+    resp = server.validate_api_response(dangerous_test_cases, MagicMock())
     assert resp is False

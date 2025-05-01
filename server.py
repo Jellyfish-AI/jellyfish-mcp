@@ -58,15 +58,26 @@ def fetch_schema(ctx: Context):
 
 
 # Returns True if the API response is valid, False otherwise
-def validate_api_response(data: json) -> bool:
-    prompt_guard = PromptGuard()
+def validate_api_response(data: json, ctx: Context) -> bool:
+    if not os.environ.get("HF_HOME"):
+        os.environ["HF_HOME"] = "~/.cache/huggingface"
+    model_path = os.path.expanduser(
+        os.path.join(os.environ["HF_HOME"], "meta-llama--Llama-Prompt-Guard-2-86M")
+    )
 
-    score = prompt_guard.get_jailbreak_score(data)
+    # Check if the model is already saved locally
+    if os.path.exists(model_path):
+        prompt_guard = PromptGuard()
 
-    print(f"PromptGuard score: {score}")
+        score = prompt_guard.get_jailbreak_score(json.dumps(data))
 
-
-    return True
+        if score < 0.5:
+            return True
+    else:
+        ctx.log("PromptGuard not available. Defaulting to allow.")
+        return True
+    
+    return False
 
 # Initialize server with lifespan
 mcp = FastMCP("Jellyfish API Server")
