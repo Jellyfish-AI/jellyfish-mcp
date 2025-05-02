@@ -93,7 +93,6 @@ def validate_api_response(data: json, ctx: Context) -> bool:
 # As such, we instead use the PromptGuard model to check for jailbreaks.
 # If one is detected, we return an error message instead of a normal response.
 def sanitize_api_response(data: json, ctx: Context) -> json:
-    print(data)
     if not validate_api_response(data, ctx):
         return {
             "error": "Request failed: Blocked",
