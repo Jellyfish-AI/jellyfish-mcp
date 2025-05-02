@@ -110,6 +110,19 @@ You won't need to do this again.
 
 2. The other option uses environment variables. If you set `JELLYFISH_API_TOKEN` it will be used as the credential. Many MCP clients allow passing through environment variables, so refer to your tool's documentation for best practices. *In general this is less secure, and isn't recommended.*
 
+### Enable PromptGuard 2
+`jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. However, you must manually configure this. To do so:
+
+1. Create an account on https://huggingface.co which is needed download the model.
+2. Navigate to the PromptGuard 2 86M model: https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M
+3. Access Meta's terms and request access to Llama models.
+4. Wait until you are granted access
+5. Create a huggingface API token from https://huggingface.co/settings/tokens (a read-only token is sufficient)
+5. Within `jellyfish-mcp`, run `uv run llamafirewall configure` and provide the token when prompted. You do not need to have it stored as a git credential.
+
+That's it. You can safely ignore warnings about `TOKENIZERS_PARALLELISM` or the `Together API key`.
+
+
 ### Configuration with VSCode + Copilot
 
 1. Open the "Command Palette..."
