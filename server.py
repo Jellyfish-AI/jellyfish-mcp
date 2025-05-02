@@ -76,8 +76,28 @@ def validate_api_response(data: json, ctx: Context) -> bool:
     else:
         ctx.log("PromptGuard not available. Defaulting to allow.")
         return True
-    
+
     return False
+
+
+# Sanitizes the API response (required as part of the MCP specification)
+# However, actually doing this robustly is non-trivial given Jellyfish
+# is meant to return data that can be user-provided. This is fine in
+# the context of "standard" tooling that can differentiate between
+# data and code, but this is not the case for LLMs.
+#
+# As such, we instead use the PromptGuard model to check for jailbreaks.
+# If one is detected, we return an error message instead of a normal response.
+def sanitize_api_response(data: json, ctx: Context) -> json:
+    print(data)
+    if not validate_api_response(data, ctx):
+        return {
+            "error": "Request failed: Blocked",
+            "message": "PromptGuard detected a potential jailbreak attempt in the response.",
+        }
+    
+    return data
+
 
 # Initialize server with lifespan
 mcp = FastMCP("Jellyfish API Server")
@@ -119,7 +139,7 @@ def list_endpoints(ctx: Context) -> dict:
             "description": path_info.get("description", ""),
         }
 
-    return endpoints
+    return sanitize_api_response(endpoints, ctx)
 
 
 # Generic tool to make GET requests to any endpoint
@@ -144,7 +164,7 @@ def get_endpoint(endpoint_path: str, ctx: Context, params: dict = None) -> dict:
     )  # Print first 500 chars of response
 
     if response.status_code == 200:
-        return response.json()
+        return sanitize_api_response(response.json(), ctx)
     else:
         return {
             "error": f"Request failed: HTTP {response.status_code}",
@@ -156,6 +176,7 @@ def get_endpoint(endpoint_path: str, ctx: Context, params: dict = None) -> dict:
 
 @mcp.tool()
 def allocations_by_person(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -174,13 +195,14 @@ def allocations_by_person(
         series (bool, optional): Whether to return series data.
         decimal_places (int, optional): Number of decimal places (1-3).
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/by_person"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_by_team(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -203,13 +225,14 @@ def allocations_by_team(
         team_hierarchy_level (int, required): Org level (1-3).
         include_person_breakout (bool, optional): Include person details.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/by_team"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_by_investment_category(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -228,13 +251,14 @@ def allocations_by_investment_category(
         series (bool, optional): Whether to return series data.
         decimal_places (int, optional): Number of decimal places (1-3).
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/investment_category"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_by_investment_category_person(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -253,13 +277,14 @@ def allocations_by_investment_category_person(
         series (bool, optional): Whether to return series data.
         decimal_places (int, optional): Number of decimal places (1-3).
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/investment_category/by_person"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_by_investment_category_team(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -282,13 +307,14 @@ def allocations_by_investment_category_team(
         team_hierarchy_level (int, required): Org level (1-3).
         include_person_breakout (bool, optional): Include person details.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/investment_category/by_team"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_by_work_category(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -309,13 +335,14 @@ def allocations_by_work_category(
         decimal_places (int, optional): Number of decimal places (1-3).
         work_category_slug (str, required): Work category slug.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/work_category"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_by_work_category_person(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -336,13 +363,14 @@ def allocations_by_work_category_person(
         decimal_places (int, optional): Number of decimal places (1-3).
         work_category_slug (str, required): Work category slug.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/work_category/by_person"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_by_work_category_team(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -367,13 +395,14 @@ def allocations_by_work_category_team(
         work_category_slug (str, required): Work category slug.
         include_person_breakout (bool, optional): Include person details.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/details/work_category/by_team"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_filter_fields(
+    ctx: Context,
     format: str = "json"
 ) -> dict:
     """
@@ -385,10 +414,11 @@ def allocations_filter_fields(
     params = {"format": format}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/filter_fields"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_summary_by_investment_category(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -415,13 +445,14 @@ def allocations_summary_by_investment_category(
         location (list, optional): List of locations.
         custom_column_laptop (list, optional): List of laptop types.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/summary_filtered/by_investment_category"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def allocations_summary_by_work_category(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -450,15 +481,16 @@ def allocations_summary_by_work_category(
         work_category_slug (str, required): Work category slug.
         custom_column_laptop (list, optional): List of laptop types.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/allocations/summary_filtered/by_work_category"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 # --- DELIVERY ---
 
 @mcp.tool()
 def deliverable_details(
+    ctx: Context,
     format: str = "json",
     deliverable_id: int = None,
 ) -> dict:
@@ -469,13 +501,14 @@ def deliverable_details(
         format (str, optional): Response format ("json" or "csv"). Default "json".
         deliverable_id (int, required): Jellyfish deliverable id.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/delivery/deliverable_details"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def deliverable_scope_and_effort_history(
+    ctx: Context,
     format: str = "json",
     deliverable_id: int = None,
     start_date: str = None,
@@ -492,13 +525,14 @@ def deliverable_scope_and_effort_history(
         end_date (str, optional): End date (YYYY-MM-DD).
         unit (str, optional): Time unit ("quarter", "month", "week").
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/delivery/scope_and_effort_history"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def work_categories(
+    ctx: Context,
     format: str = "json"
 ) -> dict:
     """
@@ -510,10 +544,11 @@ def work_categories(
     params = {"format": format}
     url = f"{API_BASE_URL}/endpoints/export/v0/delivery/work_categories"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def work_category_contents(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -540,15 +575,16 @@ def work_category_contents(
         view_archived (bool, optional): Include archived deliverables.
         team_id (list, optional): List of team IDs.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/delivery/work_category_contents"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 # --- METRICS ---
 
 @mcp.tool()
 def company_metrics(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -565,13 +601,14 @@ def company_metrics(
         unit (str, optional): Time unit ("quarter", "month", "week").
         series (bool, optional): Whether to return series data.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/metrics/company_metrics"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def person_metrics(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -590,13 +627,14 @@ def person_metrics(
         series (bool, optional): Whether to return series data.
         person_id (list, required): List of person IDs.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/metrics/person_metrics"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def team_metrics(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -615,13 +653,14 @@ def team_metrics(
         series (bool, optional): Whether to return series data.
         team_id (list, required): List of team IDs.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/metrics/team_metrics"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def team_sprint_summary(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -636,13 +675,14 @@ def team_sprint_summary(
         end_date (str, optional): End date (YYYY-MM-DD).
         team_id (int, required): Team ID.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/metrics/team_sprint_summary"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def unlinked_pull_requests(
+    ctx: Context,
     format: str = "json",
     start_date: str = None,
     end_date: str = None,
@@ -665,15 +705,16 @@ def unlinked_pull_requests(
         organization_name (list, optional): List of organization names.
         repo_name (list, optional): List of repository names.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/metrics/unlinked_pull_requests"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 # --- PEOPLE ---
 
 @mcp.tool()
 def list_engineers(
+    ctx: Context,
     format: str = "json",
     effective_date: str = None,
 ) -> dict:
@@ -684,13 +725,14 @@ def list_engineers(
         format (str, optional): Response format ("json" or "csv"). Default "json".
         effective_date (str, optional): Effective date (YYYY-MM-DD).
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/people/list_engineers"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def search_people(
+    ctx: Context,
     format: str = "json",
     name: list = None,
     email: list = None,
@@ -705,15 +747,16 @@ def search_people(
         email (list, optional): List of emails.
         person_id (list, optional): List of person IDs.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/people/search"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 # --- TEAMS ---
 
 @mcp.tool()
 def list_teams(
+    ctx: Context,
     format: str = "json",
     hierarchy_level: int = None,
     include_children: bool = None,
@@ -726,13 +769,14 @@ def list_teams(
         hierarchy_level (int, required): Team hierarchy level.
         include_children (bool, optional): Whether to include child teams.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None}
     url = f"{API_BASE_URL}/endpoints/export/v0/teams/list_teams"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 @mcp.tool()
 def search_teams(
+    ctx: Context,
     format: str = "json",
     name: list = None,
     team_id: list = None,
@@ -745,10 +789,10 @@ def search_teams(
         name (list, optional): List of team names.
         team_id (list, optional): List of team IDs.
     """
-    params = {k: v for k, v in locals().items() if k != "params" and v is not None and v != []}
+    params = {k: v for k, v in locals().items() if k != "params" and k != "ctx" and v is not None and v != []}
     url = f"{API_BASE_URL}/endpoints/export/v0/teams/search"
     response = requests.get(url, headers=HEADERS, params=params)
-    return response.json() if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
+    return sanitize_api_response(response.json(), ctx) if response.status_code == 200 else {"error": f"HTTP {response.status_code}", "message": response.text}
 
 # Run the server
 if __name__ == "__main__":

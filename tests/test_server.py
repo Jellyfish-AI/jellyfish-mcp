@@ -83,122 +83,122 @@ def test_get_endpoint_structure_and_error(monkeypatch):
 
 def test_allocations_by_person(mock_requests):
     import server
-    result = server.allocations_by_person()
+    result = server.allocations_by_person(MagicMock())
     assert result["ok"]
 
 def test_allocations_by_team(mock_requests):
     import server
-    result = server.allocations_by_team()
+    result = server.allocations_by_team(MagicMock())
     assert result["ok"]
 
 def test_allocations_by_investment_category(mock_requests):
     import server
-    result = server.allocations_by_investment_category()
+    result = server.allocations_by_investment_category(MagicMock())
     assert result["ok"]
 
 def test_allocations_by_investment_category_person(mock_requests):
     import server
-    result = server.allocations_by_investment_category_person()
+    result = server.allocations_by_investment_category_person(MagicMock())
     assert result["ok"]
 
 def test_allocations_by_investment_category_team(mock_requests):
     import server
-    result = server.allocations_by_investment_category_team()
+    result = server.allocations_by_investment_category_team(MagicMock())
     assert result["ok"]
 
 def test_allocations_by_work_category(mock_requests):
     import server
-    result = server.allocations_by_work_category()
+    result = server.allocations_by_work_category(MagicMock())
     assert result["ok"]
 
 def test_allocations_by_work_category_person(mock_requests):
     import server
-    result = server.allocations_by_work_category_person()
+    result = server.allocations_by_work_category_person(MagicMock())
     assert result["ok"]
 
 def test_allocations_by_work_category_team(mock_requests):
     import server
-    result = server.allocations_by_work_category_team()
+    result = server.allocations_by_work_category_team(MagicMock())
     assert result["ok"]
 
 def test_allocations_filter_fields(mock_requests):
     import server
-    result = server.allocations_filter_fields()
+    result = server.allocations_filter_fields(MagicMock())
     assert result["ok"]
 
 def test_allocations_summary_by_investment_category(mock_requests):
     import server
-    result = server.allocations_summary_by_investment_category()
+    result = server.allocations_summary_by_investment_category(MagicMock())
     assert result["ok"]
 
 def test_allocations_summary_by_work_category(mock_requests):
     import server
-    result = server.allocations_summary_by_work_category()
+    result = server.allocations_summary_by_work_category(MagicMock())
     assert result["ok"]
 
 def test_deliverable_details(mock_requests):
     import server
-    result = server.deliverable_details()
+    result = server.deliverable_details(MagicMock())
     assert result["ok"]
 
 def test_deliverable_scope_and_effort_history(mock_requests):
     import server
-    result = server.deliverable_scope_and_effort_history()
+    result = server.deliverable_scope_and_effort_history(MagicMock())
     assert result["ok"]
 
 def test_work_categories(mock_requests):
     import server
-    result = server.work_categories()
+    result = server.work_categories(MagicMock())
     assert result["ok"]
 
 def test_work_category_contents(mock_requests):
     import server
-    result = server.work_category_contents()
+    result = server.work_category_contents(MagicMock())
     assert result["ok"]
 
 def test_company_metrics(mock_requests):
     import server
-    result = server.company_metrics()
+    result = server.company_metrics(MagicMock())
     assert result["ok"]
 
 def test_person_metrics(mock_requests):
     import server
-    result = server.person_metrics(person_id=[1])
+    result = server.person_metrics(MagicMock(), person_id=[1])
     assert result["ok"]
 
 def test_team_metrics(mock_requests):
     import server
-    result = server.team_metrics(team_id=[1])
+    result = server.team_metrics(MagicMock(), team_id=[1])
     assert result["ok"]
 
 def test_team_sprint_summary(mock_requests):
     import server
-    result = server.team_sprint_summary(team_id=1)
+    result = server.team_sprint_summary(MagicMock(), team_id=1)
     assert result["ok"]
 
 def test_unlinked_pull_requests(mock_requests):
     import server
-    result = server.unlinked_pull_requests()
+    result = server.unlinked_pull_requests(MagicMock())
     assert result["ok"]
 
 def test_list_engineers(mock_requests):
     import server
-    result = server.list_engineers()
+    result = server.list_engineers(MagicMock())
     assert result["ok"]
 
 def test_search_people(mock_requests):
     import server
-    result = server.search_people()
+    result = server.search_people(MagicMock())
     assert result["ok"]
 
 def test_list_teams(mock_requests):
     import server
-    result = server.list_teams()
+    result = server.list_teams(MagicMock())
     assert result["ok"]
 
 def test_search_teams(mock_requests):
     import server
-    result = server.search_teams()
+    result = server.search_teams(MagicMock())
     assert result["ok"]
 
 def test_malicious_responses(mock_requests):
@@ -218,4 +218,7 @@ def test_malicious_responses(mock_requests):
     assert resp is True
 
     resp = server.validate_api_response(dangerous_test_cases, MagicMock())
+    assert resp is False
+
+    resp = server.validate_api_response(dangerous_test_cases + safe_test_cases, MagicMock())
     assert resp is False
