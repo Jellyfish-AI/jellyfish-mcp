@@ -78,7 +78,7 @@ def validate_api_response(data: json, ctx: Context) -> bool:
         if score < 0.99:
             return True
     else:
-        ctx.log("PromptGuard not available. Defaulting to allow.")
+        ctx.log("info", "PromptGuard not available. Defaulting to allow.")
         return True
 
     return False
