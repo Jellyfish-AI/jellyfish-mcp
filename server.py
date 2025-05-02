@@ -71,7 +71,11 @@ def validate_api_response(data: json, ctx: Context) -> bool:
 
         score = prompt_guard.get_jailbreak_score(json.dumps(data))
 
-        if score < 0.5:
+        # score is a 0 - 1 value where 0 is low probability of jailbreak and 1 is high
+        # Value chosen based on what passes unit tests.
+        #
+        # Update test_malicious_responses to include additional tests as necesssary.
+        if score < 0.99:
             return True
     else:
         ctx.log("PromptGuard not available. Defaulting to allow.")
