@@ -146,8 +146,8 @@ When you open VSCode from then on, bringing up the "Chat" window should and turn
 3. Find your `uv` installation path by running `which uv`.
 4. Add the following code snippet (with the appropriate paths) to `mcp.json`:
 ```json
-"mcpServers": {
-  "jellyfish": {
+{
+  "mcpServers": {
     "jellyfish": {
       "command": "/FULL/PATH/TO/uv",
       "args": [
