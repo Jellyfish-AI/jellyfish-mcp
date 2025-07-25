@@ -140,6 +140,34 @@ When you open VSCode from then on, bringing up the "Chat" window should and turn
 - "Can you get a list of my organization's teams?"
 - "Show me the API schema"
 
+### Configuration with Cursor
+1. Go to _Cursor Settings_. (_Cursor_ → _Settings..._ → _Cursor Settings_ on Mac OS.)
+2. Go to _Tools & Integrations_ and select _Add Custom MCP._
+3. Find your `uv` installation path by running `which uv`.
+4. Add the following code snippet (with the appropriate paths) to `mcp.json`:
+```json
+"mcpServers": {
+  "jellyfish": {
+    "jellyfish": {
+      "command": "/FULL/PATH/TO/uv",
+      "args": [
+        "--directory",
+        "/ABSOLUTE/PATH/TO/jellyfish-mcp",
+        "run",
+        "server.py"
+      ]
+    }
+  }
+}
+```
+5. Restart Cursor to ensure changes take effect. If everything worked, you will see `jellyfish` under _Cursor Settings_ → _Tools & Integrations_.
+
+#### Running the Server
+
+The server will start automatically when you open Cursor with the proper configuration. You can then ask Cursor chat questions about your Jellyfish data. (Make sure you are in `Agent` mode.) Examples:
+- "What endpoints are available in the Jellyfish API?"
+- "Ask Jellyfish what our company metrics were in June 2025."
+
 ### Configuration with Claude Desktop
 
 1. Create or edit your Claude Desktop configuration file at:
