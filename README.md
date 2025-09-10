@@ -64,7 +64,7 @@ There are two ways to setup the Jellyfish MCP. If using Claude Desktop, the easi
 
 ### 1. Desktop Extension Setup for Claude Desktop
 
-1. Download the `jellyfish-mcp.dxt` extension located in this repository by selecting the file name and clicking "Download raw file" in the upper right corner.
+1. Download the `jellyfish-mcp.dxt` extension located in this repository by heading to [v1.0.0 - MCP Claude Desktop Extension](https://github.com/Jellyfish-AI/jellyfish-mcp/releases/tag/v1.0.0) and clicking the file name.
 2. Once downloaded, double click the file.
 3. If it does not automatically open Claude Desktop, manually open the application.
 4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.

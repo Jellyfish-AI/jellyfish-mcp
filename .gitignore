@@ -6,8 +6,11 @@ dist/
 wheels/
 *.egg-info
 
-# Virtual environments
+# Virtual environments and node modules
 .venv
+extension/node_modules/
+extension/jellyfish-mcp.dxt
+extension/assets/*
 
 # Local notes
 notes/

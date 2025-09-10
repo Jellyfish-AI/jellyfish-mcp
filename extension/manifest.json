@@ -1,0 +1,188 @@
+{
+  "dxt_version": "0.1",
+  "name": "jellyfish-mcp",
+  "display_name": "Jellyfish MCP",
+  "version": "1.0.0",
+  "description": "Connect to your Jellyfish Software Engineering Intelligence platform for comprehensive team insights, effort allocation, and delivery metrics.",
+  "long_description": "The Jellyfish MCP allows access to your engineering organization's data through 24 specialized tools. Query allocations by person, team, or investment category; track delivery metrics and scope changes; analyze sprint performance; search people and teams; and browse work categories and deliverables. Get instant insights into engineering productivity, resource allocation patterns, and project delivery timelines. Perfect for engineering managers, team leads, and executives who need data-driven insights about their organization's development processes. Supports Llama PromptGuard 2 which can detect responses from the Jellyfish API that might include prompt injection attacks. It is *highly* recommend to configure before using daily.\n\n**Jellyfish Setup (required):** Generate an API token from your Jellyfish instance (requires Admin User Role to access)\n1. Go to the [API Export](https://app.jellyfish.co/settings/data-connections/api-export) tab on the Data Connections page.\n2. Click Generate New Token.\n3. In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog.\n4. Copy the token and paste it when prompted.\n\n**PromptGuard Setup (optional):** Generate an API token for prompt injection mitigation\n1. Create an account on [Hugging Face](https://huggingface.co).\n2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).\n3. Access Meta's terms and request access to Llama models.\n4. Wait until you are granted access.\n5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) that is a `fine-grained` token with `Make calls to Inference Providers` permissions.\n6. Copy the token and paste it when prompted.\n\n**Security Notice**: There are known risks and inherent limitations in this implementation. Refer to [`SECURITY.md`](https://github.com/Jellyfish-AI/jellyfish-mcp/blob/main/SECURITY.md) before using.",
+  "author": {
+    "name": "Jellyfish",
+    "email": "ai@jellyfish.co",
+    "url": "https://jellyfish.co/"
+  },
+  "homepage": "https://jellyfish.co/",
+  "documentation": "https://github.com/Jellyfish-AI/jellyfish-mcp",
+  "support": "https://help.jellyfish.co/hc/en-us",
+  "icon": "assets/logo.png",
+  "screenshots": [
+    "assets/1.png",
+    "assets/2.png",
+    "assets/3.png",
+    "assets/4.png",
+    "assets/5.png",
+    "assets/6.png"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "${__dirname}/server/index.js"
+      ],
+      "env": {
+        "JELLYFISH_API_TOKEN": "${user_config.jellyfish_token}",
+        "HUGGINGFACE_API_TOKEN": "${user_config.huggingface_token}",
+        "MODEL_AVAILABILITY": "${user_config.prompt_guard_availability}",
+        "MODEL_TIMEOUT": "${user_config.prompt_guard_timeout}"
+      }
+    }
+  },
+  "tools": [
+    {
+      "name": "allocations_by_person",
+      "description": "Returns allocation data for the whole company, aggregated by person."
+    },
+    {
+      "name": "allocations_by_team",
+      "description": "Returns allocation data for the whole company, aggregated by team at the specified hierarchy level."
+    },
+    {
+      "name": "allocations_by_investment_category",
+      "description": "Returns allocation data for the whole company, aggregated by investment category."
+    },
+    {
+      "name": "allocations_by_investment_category_person",
+      "description": "Returns allocation data for the whole company, aggregated by investment category and person."
+    },
+    {
+      "name": "allocations_by_investment_category_team",
+      "description": "Returns allocation data for the whole company, aggregated by investment category and team at the specified hierarchy level."
+    },
+    {
+      "name": "allocations_by_work_category",
+      "description": "Returns allocation data for the whole company, aggregated by deliverable within the specified work category."
+    },
+    {
+      "name": "allocations_by_work_category_person",
+      "description": "Returns allocation data for the whole company, aggregated by deliverable within the specified work category and person."
+    },
+    {
+      "name": "allocations_by_work_category_team",
+      "description": "Returns allocation data for the whole company, aggregated by deliverable within the specified work category and team at the specified hierarchy level."
+    },
+    {
+      "name": "allocations_filter_fields",
+      "description": "Returns a list of the available fields and known values for filtering allocations."
+    },
+    {
+      "name": "allocations_summary_by_investment_category",
+      "description": "Returns total FTE amounts for investment categories. Supports filtering."
+    },
+    {
+      "name": "allocations_summary_by_work_category",
+      "description": "Returns total FTE amounts for deliverables within a work category. Supports filtering."
+    },
+    {
+      "name": "deliverable_details",
+      "description": "Returns data about a specific deliverable."
+    },
+    {
+      "name": "deliverable_scope_and_effort_history",
+      "description": "Returns weekly data about the scope of a deliverable and the total effort allocated per week."
+    },
+    {
+      "name": "work_categories",
+      "description": "Returns a list of all known work categories."
+    },
+    {
+      "name": "work_category_contents",
+      "description": "Returns data about the deliverables in a specified work category."
+    },
+    {
+      "name": "company_metrics",
+      "description": "Returns metrics data for the company during the specified timeframe."
+    },
+    {
+      "name": "person_metrics",
+      "description": "Returns metrics data for the specified person during the specified timeframe."
+    },
+    {
+      "name": "team_metrics",
+      "description": "Returns metrics data for the specified team during the specified timeframe."
+    },
+    {
+      "name": "team_sprint_summary",
+      "description": "Returns issue count and, if available, story point data for a team's sprints in the specified timeframe."
+    },
+    {
+      "name": "unlinked_pull_requests",
+      "description": "Lists details of unlinked pull requests merged during the specified timeframe."
+    },
+    {
+      "name": "list_engineers",
+      "description": "Returns a list of all active allocatable people as of a specific date."
+    },
+    {
+      "name": "search_people",
+      "description": "Searches for people by name, email, or id."
+    },
+    {
+      "name": "list_teams",
+      "description": "Displays all teams at the specified hierarchy level. Optionally, includes child teams."
+    },
+    {
+      "name": "search_teams",
+      "description": "Searches for teams by name or id."
+    }
+  ],
+  "user_config": {
+    "jellyfish_token": {
+      "type": "string",
+      "title": "Jellyfish API Token",
+      "description": "REQUIRED: Your Jellyfish API authentication token (requires Admin User Role to access). To create a Jellyfish API token, go to https://app.jellyfish.co/settings/data-connections/api-export",
+      "required": true,
+      "sensitive": true
+    },
+    "huggingface_token": {
+      "type": "string",
+      "title": "Hugging Face API Token",
+      "description": "OPTIONAL: Your Hugging Face API authentication token (requires access to Llama models). To create a Hugging Face API token, create an account on Hugging Face (https://huggingface.co), request access to Llama models (https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M), wait until you are granted access, and then generate a 'fine-grained' token with 'Make calls to Inference Providers' permissions (https://huggingface.co/settings/tokens).",
+      "required": false,
+      "sensitive": true,
+      "default": ""
+    },
+    "prompt_guard_availability": {
+      "type": "boolean",
+      "title": "Allow Requests if Hugging Face Model Unavailable?",
+      "description": "OPTIONAL: If a Hugging Face API token is provided but the model is unavailable at the time of request, whether to allow data to be returned. If boolean is not designated and an API token is provided, the default is to block requests. If no API token is provided, data will always be returned.",
+      "required": false,
+      "default": false
+    },
+    "prompt_guard_timeout": {
+      "type": "number",
+      "title": "Hugging Face Model Timeout",
+      "description": "OPTIONAL: How long to wait for the Hugging Face model to respond, in seconds. Default is 10 seconds.",
+      "required": false,
+      "default": 10
+    }
+  },
+  "keywords": [
+    "jellyfish",
+    "engineering",
+    "analytics",
+    "team",
+    "allocation",
+    "metrics",
+    "delivery",
+    "sprint",
+    "productivity",
+    "organization",
+    "mcp",
+    "api",
+    "data",
+    "insights",
+    "management"
+  ],
+  "license": "MIT"
+}
