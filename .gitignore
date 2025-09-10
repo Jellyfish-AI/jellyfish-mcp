@@ -9,8 +9,10 @@ wheels/
 # Virtual environments and node modules
 .venv
 extension/node_modules/
-extension/jellyfish-mcp.dxt
+
+# Desktop extension
 extension/assets/*
+*.dxt
 
 # Local notes
 notes/
