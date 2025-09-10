@@ -53,7 +53,17 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 - `list_teams`
 - `search_teams`
 
-## Setup
+## Desktop Extension Setup for Claude Desktop
+
+1. Download the `jellyfish-mcp.dxt` extension located in this repository by heading to [v1.0.0 - MCP Claude Desktop Extension](https://github.com/Jellyfish-AI/jellyfish-mcp/releases/tag/v1.0.0) and clicking the file name.
+2. Once downloaded, double click the file.
+3. If it does not automatically open Claude Desktop, manually open the application.
+4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.
+5. That's it!
+6. You can now ask Claude Desktop various questions like:
+    1. "What endpoints are available in the Jellyfish API?"
+    2. "Can you get a list of my organization's teams?"
+    3. "Show me the API schema"
 
 ### **Jellyfish Setup (required):** Generate an API token from your Jellyfish instance
 
@@ -71,18 +81,6 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 4. Wait until you are granted access.
 5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) that is a 'fine-grained' token with 'Make calls to Inference Providers' permissions.
 6. Copy the token and paste it when prompted.
-
-## Extension Setup for Claude Desktop
-
-1. Download the `jellyfish-mcp.dxt` extension located in this repository by selecting the file name and clicking "Download raw file" in the upper right corner.
-2. Once downloaded, double click the file.
-3. If it does not automatically open Claude Desktop, manually open the application.
-4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.
-5. That's it!
-6. You can now ask Claude Desktop various questions like:
-    1. "What endpoints are available in the Jellyfish API?"
-    2. "Can you get a list of my organization's teams?"
-    3. "Show me the API schema"
 
 ## License
 
