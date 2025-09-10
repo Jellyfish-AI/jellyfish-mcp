@@ -22,7 +22,7 @@ Of all the trust assumptions made above, the one least likely to be true in prac
 
 These inputs can be used to perform indirect prompt injection attacks (see: [1](https://genai.owasp.org/llmrisk/llm01-prompt-injection/)) due to how large language models work: any response returned by an MCP tool will be, in some sense, treated as textual context which could be inadverently interpreted as an instruction by the LLM.
 
-Thankfully, `jellyfish-mcp` supports Llama PromptGuard 2 (see: [2](https://meta-llama.github.io/PurpleLlama/LlamaFirewall/docs/documentation/scanners/prompt-guard-2)) which can detect responses from the Jellyfish API that might include prompt injection attacks. We *highly* recommend configuring this before using daily. Keep in mind that this is a statisitical mitigation and can't catch 100% of injection attacks. If you find such novel attacks, please report them to Meta's Llama team per https://meta-llama.github.io/PurpleLlama/LlamaFirewall/docs/documentation/scanners/prompt-guard-2.
+Thankfully, `jellyfish-mcp` supports Llama PromptGuard 2 (see: [2](https://meta-llama.github.io/PurpleLlama/LlamaFirewall/docs/documentation/scanners/prompt-guard-2)) which can detect responses from the Jellyfish API that might include prompt injection attacks. We *highly* recommend configuring this before using daily. Keep in mind that this is a statistical mitigation and can't catch 100% of injection attacks. If you find such novel attacks, please report them to Meta's Llama team per https://meta-llama.github.io/PurpleLlama/LlamaFirewall/docs/documentation/scanners/prompt-guard-2.
 
 # Security Policy
 

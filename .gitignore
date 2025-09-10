@@ -6,8 +6,12 @@ dist/
 wheels/
 *.egg-info
 
-# Virtual environments
+# Virtual environments and node modules
 .venv
+extension/node_modules/
+
+# Desktop extension
+*.dxt
 
 # Local notes
 notes/

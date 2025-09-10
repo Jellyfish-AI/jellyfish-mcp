@@ -59,17 +59,50 @@ Each tool corresponds to a specific Jellyfish API endpoint and allows you to ret
 
 ## Setup
 
-### Jellyfish Setup
+There are two ways to setup the Jellyfish MCP. If using Claude Desktop, the easiest and recommended approach is with the Desktop Extension. Alternatively, the second approach is to configure the MCP locally.
 
-1. Generate an API token from your Jellyfish instance
-   - Go to the [Data Connections page](https://app.jellyfish.co/settings/data-connections/connections)
-   - Click the API Export tab
-   - Click Generate New Token
-   - In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog
-   - Copy the token (you will add it to your host application's config below)
-   - Close the dialog
 
-### Local Setup
+### 1. Desktop Extension Setup for Claude Desktop
+
+1. Download the `jellyfish-mcp.dxt` extension located in this repository by heading to [v1.0.0 - MCP Claude Desktop Extension](https://github.com/Jellyfish-AI/jellyfish-mcp/releases/tag/v1.0.0) and clicking the file name.
+2. Once downloaded, double click the file.
+3. If it does not automatically open Claude Desktop, manually open the application.
+4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.
+5. That's it!
+6. You can now ask Claude Desktop various questions like:
+    1. "What endpoints are available in the Jellyfish API?"
+    2. "Can you get a list of my organization's teams?"
+    3. "Show me the API schema"
+
+#### **Jellyfish Setup (required):** Generate an API token from your Jellyfish instance
+
+1. Go to the [API Export](https://app.jellyfish.co/settings/data-connections/api-export) tab on the Data Connections page.
+2. Click Generate New Token.
+3. In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog.
+4. Copy the token and paste it when prompted.
+
+#### **PromptGuard Setup (optional):** Generate an API token for prompt injection mitigation
+`jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. To set it up, follow the following steps.
+
+1. Create an account on [Hugging Face](https://huggingface.co).
+2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).
+3. Accept Meta's terms and request access to Llama models.
+4. Wait until you are granted access.
+5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) that is a `fine-grained` token with `Make calls to Inference Providers` permissions.
+6. Copy the token and paste it when prompted.
+
+
+
+### 2. Local Setup
+
+#### Jellyfish Setup
+
+1. Go to the [API Export](https://app.jellyfish.co/settings/data-connections/api-export) tab on the Data Connections page.
+2. Click Generate New Token.
+3. In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog.
+4. Copy the token and paste it when prompted.
+
+#### Local Setup
 
 1. Clone this repository:
 ```bash
@@ -91,9 +124,7 @@ source .venv/bin/activate
 uv pip install .
 ```
 
-## Usage
-
-### Setup credentials
+#### Setup credentials
 
 `jellyfish-mcp` supports two different modes for setting the Jellyfish Export API token.
 
@@ -110,20 +141,20 @@ You won't need to do this again.
 
 2. The other option uses environment variables. If you set `JELLYFISH_API_TOKEN` it will be used as the credential. Many MCP clients allow passing through environment variables, so refer to your tool's documentation for best practices. *In general this is less secure, and isn't recommended.*
 
-### Enable PromptGuard 2
+#### Enable PromptGuard 2
 `jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. However, you must manually configure this. To do so:
 
-1. Create an account on https://huggingface.co which is needed download the model.
-2. Navigate to the PromptGuard 2 86M model: https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M
-3. Access Meta's terms and request access to Llama models.
-4. Wait until you are granted access
-5. Create a huggingface API token from https://huggingface.co/settings/tokens (a read-only token is sufficient)
+1. Create an account on [Hugging Face](https://huggingface.co) which is needed to download the model.
+2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).
+3. Accept Meta's terms and request access to Llama models.
+4. Wait until you are granted access.
+5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) (a `read-only` token is sufficient).
 5. Within `jellyfish-mcp`, run `uv run llamafirewall configure` and provide the token when prompted. You do not need to have it stored as a git credential.
 
 That's it. You can safely ignore warnings about `TOKENIZERS_PARALLELISM` or the `Together API key`.
 
 
-### Configuration with VSCode + Copilot
+#### Configuration with VSCode + Copilot
 
 1. Open the "Command Palette..."
 2. Search for "MCP: Add Server..." and click it
@@ -132,7 +163,7 @@ That's it. You can safely ignore warnings about `TOKENIZERS_PARALLELISM` or the 
 5. Same as part of your user or workspace settings as appropriate.
 6. Restart VSCode
 
-#### Running the Server
+##### Running the Server
 
 When you open VSCode from then on, bringing up the "Chat" window should and turning on "Agent" mode should indicate that many tools have been installed from your MCP server. You can then ask Copilot various questions like:
 
@@ -140,7 +171,7 @@ When you open VSCode from then on, bringing up the "Chat" window should and turn
 - "Can you get a list of my organization's teams?"
 - "Show me the API schema"
 
-### Configuration with Cursor
+#### Configuration with Cursor
 1. Go to _Cursor Settings_. (_Cursor_ → _Settings..._ → _Cursor Settings_ on Mac OS.)
 2. Go to _Tools & Integrations_ and select _Add Custom MCP._
 3. Find your `uv` installation path by running `which uv`.
@@ -162,13 +193,13 @@ When you open VSCode from then on, bringing up the "Chat" window should and turn
 ```
 5. Restart Cursor to ensure changes take effect. If everything worked, you will see `jellyfish` under _Cursor Settings_ → _Tools & Integrations_.
 
-#### Running the Server
+##### Running the Server
 
 The server will start automatically when you open Cursor with the proper configuration. You can then ask Cursor chat questions about your Jellyfish data. (Make sure you are in `Agent` mode.) Examples:
 - "What endpoints are available in the Jellyfish API?"
 - "Ask Jellyfish what our company metrics were in June 2025."
 
-### Configuration with Claude Desktop
+#### Configuration with Claude Desktop
 
 1. Create or edit your Claude Desktop configuration file at:
    - MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -198,7 +229,7 @@ which uv
 
 4. Quit and restart Claude Desktop for the configuration changes to take effect.
 
-#### Running the Server
+##### Running the Server
 
 The server will start automatically when you open Claude Desktop with the proper configuration. You can then ask Claude questions about your Jellyfish data, such as:
 - "What endpoints are available in the Jellyfish API?"
