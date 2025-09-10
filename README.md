@@ -86,7 +86,7 @@ There are two ways to setup the Jellyfish MCP. If using Claude Desktop, the easi
 
 1. Create an account on [Hugging Face](https://huggingface.co).
 2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).
-3. Access Meta's terms and request access to Llama models.
+3. Accept Meta's terms and request access to Llama models.
 4. Wait until you are granted access.
 5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) that is a `fine-grained` token with `Make calls to Inference Providers` permissions.
 6. Copy the token and paste it when prompted.
@@ -146,7 +146,7 @@ You won't need to do this again.
 
 1. Create an account on [Hugging Face](https://huggingface.co) which is needed to download the model.
 2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).
-3. Access Meta's terms and request access to Llama models.
+3. Accept Meta's terms and request access to Llama models.
 4. Wait until you are granted access.
 5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) (a `read-only` token is sufficient).
 5. Within `jellyfish-mcp`, run `uv run llamafirewall configure` and provide the token when prompted. You do not need to have it stored as a git credential.
