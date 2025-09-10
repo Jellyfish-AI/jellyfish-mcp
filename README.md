@@ -62,7 +62,7 @@ Each tool corresponds to a specific Jellyfish API endpoint and allows you to ret
 There are two ways to setup the Jellyfish MCP. If using Claude Desktop, the easiest and recommended approach is with the Desktop Extension. Alternatively, the second approach is to configure the MCP locally.
 
 
-### Desktop Extension Setup for Claude Desktop
+### 1. Desktop Extension Setup for Claude Desktop
 
 1. Download the `jellyfish-mcp.dxt` extension located in this repository by selecting the file name and clicking "Download raw file" in the upper right corner.
 2. Once downloaded, double click the file.
@@ -93,7 +93,7 @@ There are two ways to setup the Jellyfish MCP. If using Claude Desktop, the easi
 
 
 
-### Local Setup
+### 2. Local Setup
 
 #### Jellyfish Setup
 
