@@ -201,6 +201,32 @@ def test_search_teams(mock_requests):
     result = server.search_teams(MagicMock())
     assert result["ok"]
 
+def test_headers_include_user_agent(monkeypatch):
+    """
+    Test that requests include the User-Agent header and code version.
+    """
+    import server
+
+    captured_headers = {}
+
+    class DummyResponse:
+        status_code = 200
+        text = '{"ok": true}'
+        def json(self):
+            return {"ok": True}
+
+    def capture_headers(url, headers=None, params=None):
+        captured_headers.update(headers or {})
+        return DummyResponse()
+
+    monkeypatch.setattr("requests.get", capture_headers)
+
+    # Make an arbitrary request through the MCP
+    server.work_categories(MagicMock())
+
+    assert "User-Agent" in captured_headers, "User-Agent header missing!"
+    assert "jellyfish-mcp/0.1.1 (Python)" in captured_headers["User-Agent"], "User-Agent doesn't contain the expected value"
+
 def test_malicious_responses(mock_requests):
     import server
     safe_test_cases = [
