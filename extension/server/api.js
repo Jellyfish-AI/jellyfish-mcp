@@ -1,6 +1,15 @@
 // Jellyfish API client for Node.js
 import yaml from 'js-yaml';
 import { sanitize_api_response } from './sanitizer.js';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// Get version from package.json
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'));
+const __version__ = packageJson.version;
 
 // Get API token from environment variable
 const API_TOKEN = process.env.JELLYFISH_API_TOKEN;
@@ -15,7 +24,8 @@ let apiSchema = null; // Store API schema globally
 
 // Get headers for API requests
 const HEADERS = {
-    "Authorization": `Token ${API_TOKEN}`
+    "Authorization": `Token ${API_TOKEN}`,
+    "User-Agent": `jellyfish-mcp/${__version__} (Node.js)`
 };
 
 // Function to fetch and process the schema
