@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock
+from importlib import metadata
 import pytest
 
 def test_import_server():
@@ -207,6 +208,8 @@ def test_headers_include_user_agent(monkeypatch):
     """
     import server
 
+    CURRENT_VERSION = metadata.version("jellyfish-mcp")
+
     captured_headers = {}
 
     class DummyResponse:
@@ -225,7 +228,7 @@ def test_headers_include_user_agent(monkeypatch):
     server.work_categories(MagicMock())
 
     assert "User-Agent" in captured_headers, "User-Agent header missing!"
-    assert "jellyfish-mcp/0.1.1 (Python)" in captured_headers["User-Agent"], "User-Agent doesn't contain the expected value"
+    assert f"jellyfish-mcp/{CURRENT_VERSION} (Python)" in captured_headers["User-Agent"], "User-Agent doesn't contain the expected value"
 
 def test_malicious_responses(mock_requests):
     import server

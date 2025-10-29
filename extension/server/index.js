@@ -2,6 +2,9 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
@@ -10,11 +13,17 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import * as api from "./api.js";
 
+// Get version from package.json
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8'));
+const __version__ = packageJson.version;
+
 // Initialize MCP server with name, version, and capabilities
 const server = new Server(
     {
         name: "Jellyfish API Server",
-        version: "1.0.0"
+        version: __version__
     },
     {
         capabilities: {
