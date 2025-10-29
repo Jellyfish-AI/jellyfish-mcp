@@ -7,10 +7,14 @@ from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
 import os
 from llamafirewall.scanners.promptguard_utils import PromptGuard
+from importlib import metadata
 
 # API configuration
 API_BASE_URL = "https://app.jellyfish.co"
 SCHEMA_URL = f"{API_BASE_URL}/endpoints/export/v0/schema"  # Specific URL for schema
+
+# Get version from package metadata
+__version__ = metadata.version("jellyfish-mcp")
 
 # Get API token from environment, if available.
 API_TOKEN = os.getenv("JELLYFISH_API_TOKEN")
@@ -26,7 +30,10 @@ if not API_TOKEN:
             "Or, set it in your Claude Desktop config file."
         )
 
-HEADERS = {"Authorization": f"Token {API_TOKEN}"}
+HEADERS = {
+    "Authorization": f"Token {API_TOKEN}",
+    "User-Agent": f"jellyfish-mcp/{__version__} (Python)"
+}
 
 # Store API schema globally
 api_schema = None
