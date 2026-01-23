@@ -1,6 +1,5 @@
 // Jellyfish API client for Node.js
 import yaml from 'js-yaml';
-import { sanitize_api_response } from './sanitizer.js';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -14,7 +13,7 @@ const __version__ = packageJson.version;
 // Get API token from environment variable
 const API_TOKEN = process.env.JELLYFISH_API_TOKEN;
 if (!API_TOKEN) {
-    throw new Error("No Jellyfish API key found");
+    throw new Error("No Jellyfish API token found");
 }
 
 // Get schema URL from API base URL
@@ -53,7 +52,7 @@ export async function api_get_api_schema() {
     }
 
     if (apiSchema) {
-        return sanitize_api_response(apiSchema);
+        return apiSchema;
     } else {
         return { "error": "Schema not available. Failed to fetch from API." };
     }
@@ -66,7 +65,7 @@ export async function api_list_endpoints() {
             return { "error": "Failed to fetch API schema" };
         }
     }
-    
+
     if (apiSchema === null) {
         return { "error": "Failed to fetch API schema" };
     }
@@ -83,13 +82,13 @@ export async function api_list_endpoints() {
         };
     }
 
-    return await sanitize_api_response(endpoints);
+    return endpoints;
 }
 
 // --- GENERIC API CALL FUNCTION ---
 async function api_generic(endpoint, params = {}) {
     const url = new URL(endpoint, API_BASE_URL);
-    
+
     // Add query parameters
     Object.keys(params).forEach(key => {
         if (params[key] !== undefined && params[key] !== null) {
@@ -106,21 +105,33 @@ async function api_generic(endpoint, params = {}) {
 
     try {
         const response = await fetch(url, { headers: HEADERS });
-        
+
         if (response.ok) {
             const data = await response.json();
-            return await sanitize_api_response(JSON.stringify(data));
+            return data;
         } else {
             const errorText = await response.text();
-            return { 
-                "error": `HTTP ${response.status}`, 
-                "message": errorText 
+            let message = errorText;
+
+            // Try to parse and format JSON errors
+            try {
+                const errorJson = JSON.parse(errorText);
+                message = Object.entries(errorJson)
+                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+                    .join('\n');
+            } catch {
+                // Not JSON, keep as-is
+            }
+
+            return {
+                "error": `HTTP ${response.status}`,
+                "message": message
             };
         }
     } catch (error) {
-        return { 
-            "error": "Request failed", 
-            "message": error.message 
+        return {
+            "error": "Request failed",
+            "message": error.message
         };
     }
 }
@@ -199,6 +210,12 @@ export async function api_work_categories(params = {}) {
 
 export async function api_work_category_contents(params = {}) {
     const endpoint = "/endpoints/export/v0/delivery/work_category_contents";
+    return await api_generic(endpoint, params);
+}
+
+// --- DEVEX ---
+export async function api_devex_insights_by_team(params = {}) {
+    const endpoint = "/endpoints/export/v0/devex/insights/by_team";
     return await api_generic(endpoint, params);
 }
 

@@ -35,6 +35,10 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 - `work_categories`
 - `work_category_contents`
 
+#### DevEx
+
+- `devex_insights_by_team`
+
 #### Metrics
 
 - `company_metrics`
@@ -55,7 +59,7 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 ## Desktop Extension Setup for Claude Desktop
 
-1. Download the `jellyfish-mcp.dxt` extension located in this repository by heading to [v1.0.1 - MCP Claude Desktop Extension](https://github.com/Jellyfish-AI/jellyfish-mcp/releases/tag/v1.0.1) and clicking the file name.
+1. Download the `jellyfish-mcp.mcpb` extension located in this repository by heading to the [Releases](https://github.com/Jellyfish-AI/jellyfish-mcp/releases) section and clicking the file name.
 2. Once downloaded, double click the file.
 3. If it does not automatically open Claude Desktop, manually open the application.
 4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.

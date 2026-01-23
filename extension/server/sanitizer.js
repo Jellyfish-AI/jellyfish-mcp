@@ -1,11 +1,17 @@
-// Response type constants - messages will be modified based on PROMPT_GUARD_UNAVAILABLE setting
+// Prefix constants
+const PREFIX = {
+    ALLOWING: 'Allowing data: ',
+    BLOCKING: 'Blocking data: '
+};
+
+// Response type constants
 const RESPONSE_TYPES = {
-    NO_TOKEN: 'PromptGuard token not found',
-    INVALID_TOKEN: 'PromptGuard token invalid',
-    BLOCKED: 'PromptGuard blocked for potential jailbreak', 
-    PASSED: 'PromptGuard passed',
-    UNAVAILABLE: 'PromptGuard unavailable',
-    TIMEOUT: 'PromptGuard timed out'
+    NO_TOKEN: 'PromptGuard is not configured. To enable, add Hugging Face API token in your server configuration.',  // Always allow
+    INVALID_TOKEN: 'PromptGuard API token is invalid. Check your Hugging Face API token.',          // Depends on setting
+    BLOCKED: 'PromptGuard blocked response for potential jailbreak attempt.',                       // Always block
+    PASSED: 'PromptGuard security check passed.',                                                   // Always allow
+    UNAVAILABLE: 'PromptGuard service is temporarily unavailable.',                                 // Depends on setting
+    TIMEOUT: 'PromptGuard request timed out. To extend timeout, update your server configuration.'  // Depends on setting
 };
 
 // Get API token from environment variable
@@ -21,12 +27,6 @@ const HEADERS = {
     "Authorization": `Bearer ${HF_TOKEN}`,
     "Content-Type": "application/json",
 };
-
-// Helper function to add default behavior to messages
-function addDefaultBehavior(message, allowData) {
-    const defaultText = allowData ? ' -- allowing data' : ' -- blocking data';
-    return message + defaultText;
-}
 
 // Calls the PromptGuard model and returns status: 'blocked', 'passed', or 'unavailable'
 async function query_prompt_guard(data) {
@@ -84,39 +84,43 @@ async function query_prompt_guard(data) {
 //
 // As such, we instead use the PromptGuard model to check for jailbreaks.
 // If one is detected, we return an error message instead of a normal response.
+//
+// Returns: { approved: boolean, message: string }
 export async function sanitize_api_response(data) {
     // Check if HF token is missing
     if (!HF_TOKEN) {
         return {
-            message: RESPONSE_TYPES.NO_TOKEN,
-            data: JSON.parse(data)
+            approved: true,
+            message: PREFIX.ALLOWING + RESPONSE_TYPES.NO_TOKEN
         };
     }
-    
+
     // Query PromptGuard - returns message string
     const message = await query_prompt_guard({inputs: data});
-    
+
     // If blocked, always return error without data
     if (message === RESPONSE_TYPES.BLOCKED) {
         return {
-            error: message
+            approved: false,
+            message: PREFIX.BLOCKING + message
         };
     // If passed, always return data
     } else if (message === RESPONSE_TYPES.PASSED) {
         return {
-            message: message,
-            data: JSON.parse(data)
+            approved: true,
+            message: PREFIX.ALLOWING + message
         };
     // PromptGuard unavailable, timed out, or invalid token -- return data if PROMPT_GUARD_UNAVAILABLE is true
     } else if (PROMPT_GUARD_UNAVAILABLE === true) {
         return {
-            message: addDefaultBehavior(message, true),
-            data: JSON.parse(data)
+            approved: true,
+            message: PREFIX.ALLOWING + message
         };
     }
-    
+
     // PromptGuard unavailable, timed out, or invalid token -- don't return data if PROMPT_GUARD_UNAVAILABLE is false
     return {
-        error: addDefaultBehavior(message, false)
+        approved: false,
+        message: PREFIX.BLOCKING + message
     };
 }
