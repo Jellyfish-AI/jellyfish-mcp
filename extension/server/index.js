@@ -12,6 +12,8 @@ import {
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import * as api from "./api.js";
+import { encode } from '@toon-format/toon';
+import { sanitize_api_response } from './sanitizer.js';
 
 // Get version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -44,25 +46,84 @@ function filter_params(params) {
     return filtered;
 }
 
-// Helper function to format tool API response for MCP
-function format_tool_response(data) {
-    return {
-        content: [{
-            type: "text",
-            text: JSON.stringify(data)
-        }]
-    };
+// Helper function to sanitize API response
+async function sanitize_response(data) {
+    // Check if it's an error response from api.js
+    if (data.error) {
+        return {
+            approved: false,
+            message: `Error: ${data.error}${data.message ? `\n${data.message}` : ''}`
+        };
+    }
+
+    // Encode to TOON first, then sanitize what will actually be sent to LLM
+    const toonData = encode(data);
+    const sanitizeResult = await sanitize_api_response(toonData);
+
+    if (sanitizeResult.approved) {
+        return {
+            approved: true,
+            message: sanitizeResult.message,
+            toonData: toonData
+        };
+    } else {
+        return {
+            approved: false,
+            message: sanitizeResult.message
+        };
+    }
 }
 
-// Helper function to format resource API response for MCP
-function format_resource_response(uri, data) {
-    return {
-        contents: [{
-            uri: uri,
-            mimeType: "application/json",
-            text: JSON.stringify(data)
-        }]
-    };
+// Helper function to format sanitized response for MCP tools
+function format_tool_response(sanitizeResult) {
+    if (sanitizeResult.approved) {
+        return {
+            content: [{
+                type: "text",
+                text: `${sanitizeResult.message}\n\n${sanitizeResult.toonData}`
+            }]
+        };
+    } else {
+        return {
+            content: [{
+                type: "text",
+                text: sanitizeResult.message
+            }]
+        };
+    }
+}
+
+// Helper function to format sanitized response for MCP resources
+function format_resource_response(uri, sanitizeResult) {
+    if (sanitizeResult.approved) {
+        return {
+            contents: [{
+                uri: uri,
+                mimeType: "text/plain",
+                text: sanitizeResult.toonData
+            }]
+        };
+    } else {
+        return {
+            contents: [{
+                uri: uri,
+                mimeType: "text/plain",
+                text: sanitizeResult.message
+            }]
+        };
+    }
+}
+
+// Helper function to process tool response (combines sanitize + format)
+async function process_tool_response(data) {
+    const sanitizeResult = await sanitize_response(data);
+    return format_tool_response(sanitizeResult);
+}
+
+// Helper function to process resource response (sanitize + format)
+async function process_resource_response(uri, data) {
+    const sanitizeResult = await sanitize_response(data);
+    return format_resource_response(uri, sanitizeResult);
 }
 
 
@@ -84,14 +145,7 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
 server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     if (request.params.uri == "schema://api") {
         const data = await api.api_get_api_schema();
-        return {
-            contents: [{
-                uri: "schema://api",
-                mimeType: "application/json",
-                text: JSON.stringify(data)
-            }]
-        };
-        // return format_resource_response("schema://api", await api.api_get_api_schema());
+        return process_resource_response("schema://api", data);
     }
     throw new Error(`Unknown resource: ${request.params.uri}`);
 });
@@ -365,6 +419,26 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     required: ["work_category_slug"]
                 }
             },
+            // DEVEX
+            {
+                name: "devex_insights_by_team",
+                description: "Returns DevEx insights data.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        format: { type: "string", default: "json", description: "Response format" },
+                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
+                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
+                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                        id: { type: "integer", description: "Jellyfish team id" },
+                        devex_team_ref: { type: "string", description: "Unique identifier for a team in DevEx" },
+                        team_id: { type: "integer", description: "Jellyfish team id" },
+                        series_id: { type: "string", description: "Unique identifier for a series in DevEx" },
+                        survey_id: { type: "string", description: "Unique identifier for a survey in DevEx" }
+                    },
+                    required: []
+                }
+            },
             // METRICS
             {
                 name: "company_metrics",
@@ -510,61 +584,65 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     switch (request.params.name) {
         // ALLOCATIONS
         case "allocations_by_person":
-            return format_tool_response(await api.api_allocations_by_person(params));
+            return process_tool_response(await api.api_allocations_by_person(params));
         case "allocations_by_team":
-            return format_tool_response(await api.api_allocations_by_team(params));
+            return process_tool_response(await api.api_allocations_by_team(params));
         case "allocations_by_investment_category":
-            return format_tool_response(await api.api_allocations_by_investment_category(params));
+            return process_tool_response(await api.api_allocations_by_investment_category(params));
         case "allocations_by_investment_category_person":
-            return format_tool_response(await api.api_allocations_by_investment_category_person(params));
+            return process_tool_response(await api.api_allocations_by_investment_category_person(params));
         case "allocations_by_investment_category_team":
-            return format_tool_response(await api.api_allocations_by_investment_category_team(params));
+            return process_tool_response(await api.api_allocations_by_investment_category_team(params));
         case "allocations_by_work_category":
-            return format_tool_response(await api.api_allocations_by_work_category(params));
+            return process_tool_response(await api.api_allocations_by_work_category(params));
         case "allocations_by_work_category_person":
-            return format_tool_response(await api.api_allocations_by_work_category_person(params));
+            return process_tool_response(await api.api_allocations_by_work_category_person(params));
         case "allocations_by_work_category_team":
-            return format_tool_response(await api.api_allocations_by_work_category_team(params));
+            return process_tool_response(await api.api_allocations_by_work_category_team(params));
         case "allocations_filter_fields":
-            return format_tool_response(await api.api_allocations_filter_fields({ format: "json" }));
+            return process_tool_response(await api.api_allocations_filter_fields({ format: "json" }));
         case "allocations_summary_by_investment_category":
-            return format_tool_response(await api.api_allocations_summary_by_investment_category(params));
+            return process_tool_response(await api.api_allocations_summary_by_investment_category(params));
         case "allocations_summary_by_work_category":
-            return format_tool_response(await api.api_allocations_summary_by_work_category(params));
-        
+            return process_tool_response(await api.api_allocations_summary_by_work_category(params));
+
         // DELIVERY
         case "deliverable_details":
-            return format_tool_response(await api.api_deliverable_details(params));
+            return process_tool_response(await api.api_deliverable_details(params));
         case "deliverable_scope_and_effort_history":
-            return format_tool_response(await api.api_deliverable_scope_and_effort_history(params));
+            return process_tool_response(await api.api_deliverable_scope_and_effort_history(params));
         case "work_categories":
-            return format_tool_response(await api.api_work_categories({ format: "json" }));
+            return process_tool_response(await api.api_work_categories({ format: "json" }));
         case "work_category_contents":
-            return format_tool_response(await api.api_work_category_contents(params));
-        
+            return process_tool_response(await api.api_work_category_contents(params));
+
+        // DEVEX
+        case "devex_insights_by_team":
+            return process_tool_response(await api.api_devex_insights_by_team(params));
+
         // METRICS
         case "company_metrics":
-            return format_tool_response(await api.api_company_metrics(params));
+            return process_tool_response(await api.api_company_metrics(params));
         case "person_metrics":
-            return format_tool_response(await api.api_person_metrics(params));
+            return process_tool_response(await api.api_person_metrics(params));
         case "team_metrics":
-            return format_tool_response(await api.api_team_metrics(params));
+            return process_tool_response(await api.api_team_metrics(params));
         case "team_sprint_summary":
-            return format_tool_response(await api.api_team_sprint_summary(params));
+            return process_tool_response(await api.api_team_sprint_summary(params));
         case "unlinked_pull_requests":
-            return format_tool_response(await api.api_unlinked_pull_requests(params));
-        
+            return process_tool_response(await api.api_unlinked_pull_requests(params));
+
         // PEOPLE
         case "list_engineers":
-            return format_tool_response(await api.api_list_engineers(params));
+            return process_tool_response(await api.api_list_engineers(params));
         case "search_people":
-            return format_tool_response(await api.api_search_people(params));
-        
+            return process_tool_response(await api.api_search_people(params));
+
         // TEAMS
         case "list_teams":
-            return format_tool_response(await api.api_list_teams(params));
+            return process_tool_response(await api.api_list_teams(params));
         case "search_teams":
-            return format_tool_response(await api.api_search_teams(params));
+            return process_tool_response(await api.api_search_teams(params));
         
         default:
             throw new Error(`Unknown tool: ${request.params.name}`);

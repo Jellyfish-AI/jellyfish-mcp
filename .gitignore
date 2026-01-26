@@ -9,9 +9,11 @@ wheels/
 # Virtual environments and node modules
 .venv
 extension/node_modules/
+package-lock.json
 
 # Desktop extension
 *.dxt
+*.mcpb
 
 # Local notes
 notes/
