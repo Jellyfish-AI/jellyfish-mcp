@@ -331,10 +331,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                         include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
                         max_n_allocation_card_keys: { type: "integer", description: "CRITICAL: Limits card keys per entry to top N by allocation to prevent massive responses. Default (omitted) returns ALL card keys which is rarely advised. RECOMMENDED VALUES: 0=totals only (no card-level detail needed), 3-5=executive summary, 5-10=standard analysis, 10-20=detailed analysis." },
-                        team_id: { type: "array", description: "List of team IDs. Returns total FTE amounts for only people in these team IDs, all of which must be at the same hierarchy org level. Can include 'null' for people with no team." },
-                        role: { type: "array", description: "List of roles. Returns total FTE amounts for only people with these roles. Can include 'null' for people with no role. To check what roles are available, use the allocations_filter_fields tool." },
-                        location: { type: "array", description: "List of locations. Returns total FTE amounts for only people with these locations. Can include 'null' for people with no location. To check what locations are available, use the allocations_filter_fields tool." },
-                        custom_column_laptop: { type: "array", description: "List of laptop types. Returns total FTE amounts for only people with these custom field values. Can include 'null' for people with no value for this field. To check what values are available, use the allocations_filter_fields tool." }
+                        team_id: { type: "array", items: {type: "string"}, description: "List of team IDs. Returns total FTE amounts for only people in these team IDs, all of which must be at the same hierarchy org level. Can include 'null' for people with no team." },
+                        role: { type: "array", items: {type: "string"}, description: "List of roles. Returns total FTE amounts for only people with these roles. Can include 'null' for people with no role. To check what roles are available, use the allocations_filter_fields tool." },
+                        location: { type: "array", items: {type: "string"}, description: "List of locations. Returns total FTE amounts for only people with these locations. Can include 'null' for people with no location. To check what locations are available, use the allocations_filter_fields tool." },
+                        custom_column_laptop: { type: "array", items: {type: "string"}, description: "List of laptop types. Returns total FTE amounts for only people with these custom field values. Can include 'null' for people with no value for this field. To check what values are available, use the allocations_filter_fields tool." }
                     },
                     required: []
                 }
@@ -353,11 +353,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                         include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
                         max_n_allocation_card_keys: { type: "integer", description: "CRITICAL: Limits card keys per entry to top N by allocation to prevent massive responses. Default (omitted) returns ALL card keys which is rarely advised. RECOMMENDED VALUES: 0=totals only (no card-level detail needed), 3-5=executive summary, 5-10=standard analysis, 10-20=detailed analysis." },
-                        team_id: { type: "array", description: "List of team IDs. Returns total FTE amounts for only people in these team IDs, all of which must be at the same hierarchy org level. Can include 'null' for people with no team." },
-                        role: { type: "array", description: "List of roles. Returns total FTE amounts for only people with these roles. Can include 'null' for people with no role. To check what roles are available, use the allocations_filter_fields tool." },
-                        location: { type: "array", description: "List of locations. Returns total FTE amounts for only people with these locations. Can include 'null' for people with no location. To check what locations are available, use the allocations_filter_fields tool." },
+                        team_id: { type: "array", items: {type: "string"}, description: "List of team IDs. Returns total FTE amounts for only people in these team IDs, all of which must be at the same hierarchy org level. Can include 'null' for people with no team." },
+                        role: { type: "array", items: {type: "string"}, description: "List of roles. Returns total FTE amounts for only people with these roles. Can include 'null' for people with no role. To check what roles are available, use the allocations_filter_fields tool." },
+                        location: { type: "array", items: {type: "string"}, description: "List of locations. Returns total FTE amounts for only people with these locations. Can include 'null' for people with no location. To check what locations are available, use the allocations_filter_fields tool." },
                         work_category_slug: { type: "string", description: "Work category slug" },
-                        custom_column_laptop: { type: "array", description: "List of laptop types. Returns total FTE amounts for only people with these custom field values. Can include 'null' for people with no value for this field. To check what values are available, use the allocations_filter_fields tool." }
+                        custom_column_laptop: { type: "array", items: {type: "string"}, description: "List of laptop types. Returns total FTE amounts for only people with these custom field values. Can include 'null' for people with no value for this field. To check what values are available, use the allocations_filter_fields tool." }
                     },
                     required: ["work_category_slug"]
                 }
@@ -414,7 +414,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         completed_only: { type: "boolean", description: "Only completed deliverables" },
                         inprogress_only: { type: "boolean", description: "Only in-progress deliverables" },
                         view_archived: { type: "boolean", description: "Include archived deliverables" },
-                        team_id: { type: "array", description: "List of team IDs" }
+                        team_id: { type: "array", items: {type: "integer"}, description: "List of team IDs" }
                     },
                     required: ["work_category_slug"]
                 }
@@ -466,7 +466,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                         unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
                         series: { type: "boolean", description: "Whether to return series data" },
-                        person_id: { type: "array", description: "List of person IDs" }
+                        person_id: { type: "array", items: {type: "integer"}, description: "List of person IDs" }
                     },
                     required: ["person_id"]
                 }
@@ -482,7 +482,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                         unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\", \"sprint\")" },
                         series: { type: "boolean", description: "Whether to return series data" },
-                        team_id: { type: "array", description: "List of team IDs" }
+                        team_id: { type: "array", items: {type: "integer"}, description: "List of team IDs" }
                     },
                     required: ["team_id"]
                 }
@@ -512,9 +512,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                         unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
                         series: { type: "boolean", description: "Whether to return series data" },
-                        instance_slug: { type: "array", description: "List of git instance slugs" },
-                        organization_name: { type: "array", description: "List of organization names" },
-                        repo_name: { type: "array", description: "List of repository names" }
+                        instance_slug: { type: "array", items: {type: "string"}, description: "List of git instance slugs" },
+                        organization_name: { type: "array", items: {type: "string"}, description: "List of organization names" },
+                        repo_name: { type: "array", items: {type: "string"}, description: "List of repository names" }
                     },
                     required: []
                 }
@@ -539,9 +539,9 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     type: "object",
                     properties: {
                         format: { type: "string", default: "json", description: "Response format" },
-                        name: { type: "array", description: "List of names" },
-                        email: { type: "array", description: "List of emails" },
-                        person_id: { type: "array", description: "List of person IDs" }
+                        name: { type: "array", items: {type: "string"}, description: "List of names" },
+                        email: { type: "array", items: {type: "string"}, description: "List of emails" },
+                        person_id: { type: "array", items: {type: "integer"}, description: "List of person IDs" }
                     },
                     required: []
                 }
@@ -567,8 +567,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     type: "object",
                     properties: {
                         format: { type: "string", default: "json", description: "Response format" },
-                        name: { type: "array", description: "List of team names" },
-                        team_id: { type: "array", description: "List of team IDs" }
+                        name: { type: "array", items: {type: "string"}, description: "List of team names" },
+                        team_id: { type: "array", items: {type: "integer"}, description: "List of team IDs" }
                     },
                     required: []
                 }

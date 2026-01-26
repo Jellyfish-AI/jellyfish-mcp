@@ -3,6 +3,9 @@
   "version": "1.0.2",
   "type": "module",
   "main": "server/index.js",
+  "scripts": {
+    "test": "node --test tests/test_server.js"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.23.0",
     "@toon-format/toon": "^2.0.0",
