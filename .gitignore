@@ -1,25 +1,9 @@
-# Python-generated files
-__pycache__/
-*.py[oc]
-build/
-dist/
-wheels/
-*.egg-info
-
-# Virtual environments and node modules
-.venv
-extension/node_modules/
+# Dependencies
+node_modules/
 package-lock.json
 
 # Desktop extension
-*.dxt
 *.mcpb
-
-# Local notes
-notes/
-
-# Local settings
-.vscode/settings.json
 
 # macOS
 .DS_Store

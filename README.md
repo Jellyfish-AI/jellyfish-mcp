@@ -6,15 +6,18 @@
 
 A Model Context Protocol server for retrieving and analyzing data from Jellyfish's API. This server allows a host (e.g. Claude Desktop or Cursor) to interact with your Jellyfish instance, enabling natural language queries about your engineering metrics, team data, and other information available through the Jellyfish API.
 
-### Tools
+Once you have the Jellyfish MCP connected, you can ask questions about your Jellyfish data, such as:
+- "What were our company metrics in December 2025?"
+- "Can you get a list of my organization's teams?"
+- "What are the unlinked pull requests for the last month?"
 
-The server provides several tools for interacting with the Jellyfish API:
+### Tools and Resources
+
+The server provides several tools for interacting with the Jellyfish API. Each tool corresponds to a specific Jellyfish API endpoint and allows you to retrieve or search for data as described in the API.
 
 #### General
 
-- `get_api_schema` - Retrieves the complete API schema with all available endpoints
-- `list_endpoints` - Lists all available API endpoints with their descriptions
-- `get_endpoint` - Makes GET requests to any available API endpoint
+- `get_api_schema` - Retrieves the complete API schema with all available API endpoints
 
 #### Allocations
 
@@ -59,33 +62,17 @@ The server provides several tools for interacting with the Jellyfish API:
 - `list_teams`
 - `search_teams`
 
-Each tool corresponds to a specific Jellyfish API endpoint and allows you to retrieve or search for data as described in the API.
 
-## Setup
+## Setup - Step 1: Collect API Tokens
 
-There are two ways to setup the Jellyfish MCP. If using Claude Desktop, the easiest and recommended approach is with the Desktop Extension. Alternatively, the second approach is to configure the MCP locally.
-
-
-### 1. Desktop Extension Setup for Claude Desktop
-
-1. Download the `jellyfish-mcp.mcpb` extension located in this repository by heading to the [Releases](https://github.com/Jellyfish-AI/jellyfish-mcp/releases) section and clicking the file name.
-2. Once downloaded, double click the file.
-3. If it does not automatically open Claude Desktop, manually open the application.
-4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.
-5. That's it!
-6. You can now ask Claude Desktop various questions like:
-    1. "What endpoints are available in the Jellyfish API?"
-    2. "Can you get a list of my organization's teams?"
-    3. "Show me the API schema"
-
-#### **Jellyfish Setup (required):** Generate an API token from your Jellyfish instance
+### Jellyfish Setup (required): Generate an API token from your Jellyfish instance
 
 1. Go to the [API Export](https://app.jellyfish.co/settings/data-connections/api-export) tab on the Data Connections page.
 2. Click Generate New Token.
 3. In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog.
 4. Copy the token and paste it when prompted.
 
-#### **PromptGuard Setup (optional):** Generate an API token for prompt injection mitigation
+### PromptGuard Setup (optional): Generate an API token for prompt injection mitigation
 `jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. To set it up, follow the following steps.
 
 1. Create an account on [Hugging Face](https://huggingface.co).
@@ -96,162 +83,129 @@ There are two ways to setup the Jellyfish MCP. If using Claude Desktop, the easi
 6. Copy the token and paste it when prompted.
 
 
+## Setup - Step 2: Connect to Host Applications
 
-### 2. Local Setup
+There are different ways to setup the Jellyfish MCP depending on the host application. The easiest and recommended approach is with Claude Desktop using the Desktop Extension. Alternatively, the Jellyfish MCP can be configured locally for all other host applications.
 
-#### Jellyfish Setup
+### Claude Desktop
 
-1. Go to the [API Export](https://app.jellyfish.co/settings/data-connections/api-export) tab on the Data Connections page.
-2. Click Generate New Token.
-3. In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog.
-4. Copy the token and paste it when prompted.
+1. Download the `jellyfish-mcp.mcpb` extension located in this repository by heading to the [Releases](https://github.com/Jellyfish-AI/jellyfish-mcp/releases) section and clicking the file name.
+2. Once downloaded, double click the file.
+3. If it does not automatically open Claude Desktop, manually open the application.
+4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.
+5. That's it!
 
-#### Local Setup
+### All Other Host Applications
 
+For Claude Code, VSCode, Cursor, and all other host applications, you need to set up the server locally first, then configure your specific application. Prerequisites: Node.js (v18 or later).
+
+#### Local Setup:
 1. Clone this repository:
 ```bash
 git clone [repository-url]
 cd jellyfish-mcp
 ```
 
-2. Install uv if you haven't already:
+2. Install dependencies:
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
+npm install
 ```
 
-3. Restart your terminal or open a new terminal window to ensure uv is in your PATH.
+3. Understand the environment variables: There is no action required in this step, but you will need to configure these environment variables when setting up your host application. `JELLYFISH_API_TOKEN` is the only required environment variable. The remaining three are optional and correspond to PromptGuard, which uses Meta's Llama PromptGuard 2 model to help mitigate prompt injection attacks.
 
-4. Create a virtual environment and install dependencies:
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `JELLYFISH_API_TOKEN` | Your Jellyfish API token. | Yes | - |
+| `HUGGINGFACE_API_TOKEN` | Your Hugging Face API token. If not provided, PromptGuard is disabled and data is always returned. | No | - |
+| `MODEL_AVAILABILITY` | Controls behavior when PromptGuard cannot be reached (service unavailable, timeout, or invalid token). Set to `true` to allow data if PromptGuard cannot be reached. Set to `false` to block data until PromptGuard can verify response. | No | `false` |
+| `MODEL_TIMEOUT` | How long to wait for the PromptGuard model to respond, in seconds. | No | `10` |
+
+
+#### Claude Code:
+1. Run the following command in your terminal:
 ```bash
-uv venv
-source .venv/bin/activate
-uv pip install .
+claude mcp add --transport stdio jellyfish-mcp -- node /ABSOLUTE/PATH/TO/jellyfish-mcp/server/index.js
 ```
-
-#### Setup credentials
-
-`jellyfish-mcp` supports two different modes for setting the Jellyfish Export API token.
-
-1. The preferred method is to use `keyring`, which comes with `jellyfish-mcp`. It is
-   the most secure and ensures credentials are stored using your operating system's
-   preferred credential store. Set your token on your system by running the following in your shell:
-
-```bash
-uv run python -m keyring set jellyfish api_token
-```
-
-You will then be prompted to set a password. Paste in your API token from Jellyfish and you're good to go.
-You won't need to do this again.
-
-2. The other option uses environment variables. If you set `JELLYFISH_API_TOKEN` it will be used as the credential. Many MCP clients allow passing through environment variables, so refer to your tool's documentation for best practices. *In general this is less secure, and isn't recommended.*
-
-#### Enable PromptGuard 2
-`jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. However, you must manually configure this. To do so:
-
-1. Create an account on [Hugging Face](https://huggingface.co) which is needed to download the model.
-2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).
-3. Accept Meta's terms and request access to Llama models.
-4. Wait until you are granted access.
-5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) (a `read-only` token is sufficient).
-5. Within `jellyfish-mcp`, run `uv run llamafirewall configure` and provide the token when prompted. You do not need to have it stored as a git credential.
-
-That's it. You can safely ignore warnings about `TOKENIZERS_PARALLELISM` or the `Together API key`.
-
-
-#### Configuration with VSCode + Copilot
-
-1. Open the "Command Palette..."
-2. Search for "MCP: Add Server..." and click it
-3. In the dialog box that appears provide: `</FULL/PATH/TO/u> --directory </ABSOLUTE/PATH/TO/jellyfish-mcp> run server.py`
-4. Give the MCP server a name
-5. Same as part of your user or workspace settings as appropriate.
-6. Restart VSCode
-
-##### Running the Server
-
-When you open VSCode from then on, bringing up the "Chat" window should and turning on "Agent" mode should indicate that many tools have been installed from your MCP server. You can then ask Copilot various questions like:
-
-- "What endpoints are available in the Jellyfish API?"
-- "Can you get a list of my organization's teams?"
-- "Show me the API schema"
-
-#### Configuration with Cursor
-1. Go to _Cursor Settings_. (_Cursor_ → _Settings..._ → _Cursor Settings_ on Mac OS.)
-2. Go to _Tools & Integrations_ and select _Add Custom MCP._
-3. Find your `uv` installation path by running `which uv`.
-4. Add the following code snippet (with the appropriate paths) to `mcp.json`:
+2. Open the `.claude.json` file that was modified and add the `env` block to the `jellyfish-mcp` entry:
 ```json
-{
-  "mcpServers": {
-    "jellyfish": {
-      "command": "/FULL/PATH/TO/uv",
-      "args": [
-        "--directory",
-        "/ABSOLUTE/PATH/TO/jellyfish-mcp",
-        "run",
-        "server.py"
-      ]
+"mcpServers": {
+  "jellyfish-mcp": {
+    "type": "stdio",
+    "command": "node",
+    "args": [
+      "/ABSOLUTE/PATH/TO/jellyfish-mcp/server/index.js"
+    ],
+    "env": {
+      "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+      "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+      "MODEL_AVAILABILITY": "true_or_false",
+      "MODEL_TIMEOUT": "seconds"
     }
   }
 }
 ```
-5. Restart Cursor to ensure changes take effect. If everything worked, you will see `jellyfish` under _Cursor Settings_ → _Tools & Integrations_.
+3. Run `claude mcp list` to verify the server is connected.
 
-##### Running the Server
 
-The server will start automatically when you open Cursor with the proper configuration. You can then ask Cursor chat questions about your Jellyfish data. (Make sure you are in `Agent` mode.) Examples:
-- "What endpoints are available in the Jellyfish API?"
-- "Ask Jellyfish what our company metrics were in June 2025."
-
-#### Configuration with Claude Desktop
-
-1. Create or edit your Claude Desktop configuration file at:
-   - MacOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - Windows: `%AppData%\Claude\claude_desktop_config.json`
-
-2. Find your uv installation path by running:
-```bash
-which uv
+#### VSCode:
+1. Open the _Command Palette..._ (_View_ → _Command Palette..._ on Mac OS)
+2. Search for _MCP: Add Server..._ and press Enter
+3. Select _Command (stdio)_
+4. Enter `node /ABSOLUTE/PATH/TO/jellyfish-mcp/server/index.js` and press Enter
+5. Enter `jellyfish-mcp` as the server name and press Enter
+6. Open the generated config file (`.vscode/mcp.json`) and add the `env` block:
+```json
+{
+  "servers": {
+    "jellyfish-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "/ABSOLUTE/PATH/TO/jellyfish-mcp/server/index.js"
+      ],
+      "env": {
+        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+        "MODEL_AVAILABILITY": "true_or_false",
+        "MODEL_TIMEOUT": "seconds"
+      }
+    }
+  },
+  "inputs": []
+}
 ```
 
-3. Add the following configuration (replace paths with your values):
+
+#### Cursor:
+1. Go to _Cursor Settings_ (_Cursor_ → _Settings..._ → _Cursor Settings_ on Mac OS)
+2. Go to _Tools & MCP_ and select _Add Custom MCP_
+3. Add the following to `mcp.json` (with the appropriate paths):
 ```json
 {
   "mcpServers": {
-    "jellyfish": {
-      "command": "/FULL/PATH/TO/uv",
+    "jellyfish-mcp": {
+      "command": "node",
       "args": [
-        "--directory",
-        "/ABSOLUTE/PATH/TO/jellyfish-mcp",
-        "run",
-        "server.py"
-      ]
+        "/ABSOLUTE/PATH/TO/jellyfish-mcp/server/index.js"
+      ],
+      "env": {
+        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+        "MODEL_AVAILABILITY": "true_or_false",
+        "MODEL_TIMEOUT": "seconds"
+      }
     }
   }
 }
 ```
-
-4. Quit and restart Claude Desktop for the configuration changes to take effect.
-
-##### Running the Server
-
-The server will start automatically when you open Claude Desktop with the proper configuration. You can then ask Claude questions about your Jellyfish data, such as:
-- "What endpoints are available in the Jellyfish API?"
-- "Can you get a list of my organization's teams?"
-- "Show me the API schema"
 
 ## Troubleshooting
 
 If you encounter issues:
 
-1. Check Claude Desktop logs:
-```bash
-tail -n 20 -f ~/Library/Logs/Claude/mcp*.log
-```
-
-2. Verify your API token is correct and has the necessary permissions
-3. Ensure your Jellyfish instance is accessible from your machine
-4. Check that the paths in your Claude Desktop config are absolute and correct
+1. Verify your API token is correct and has the necessary permissions
+2. Ensure your Jellyfish instance is accessible from your machine
+3. Check that the paths in your config files are absolute and correct
 
 ## License
 
