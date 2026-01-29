@@ -73,7 +73,7 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 4. Copy the token and paste it when prompted.
 
 ### PromptGuard Setup (optional): Generate an API token for prompt injection mitigation
-`jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. To set it up, follow the following steps.
+`jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. To set it up, follow these steps.
 
 1. Create an account on [Hugging Face](https://huggingface.co).
 2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).
@@ -85,33 +85,9 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 ## Setup - Step 2: Connect to Host Applications
 
-There are different ways to setup the Jellyfish MCP depending on the host application. The easiest and recommended approach is with Claude Desktop using the Desktop Extension. Alternatively, the Jellyfish MCP can be configured locally for all other host applications.
+There are _three_ different ways to connect to the Jellyfish MCP: A) Claude Desktop Extension, B) Docker, or C) Locally. The easiest and recommended approach is with Claude Desktop using the Desktop Extension. For all other host applications (Claude Code, VSCode, Cursor, etc), you can use either Docker or Local Setup. Docker is recommended since it doesn't require Node.js or managing dependencies. Use the local setup if you want more control or want to modify the source code.
 
-### Claude Desktop
-
-1. Download the `jellyfish-mcp.mcpb` extension located in this repository by heading to the [Releases](https://github.com/Jellyfish-AI/jellyfish-mcp/releases) section and clicking the file name.
-2. Once downloaded, double click the file.
-3. If it does not automatically open Claude Desktop, manually open the application.
-4. Follow the instructions on the Claude Desktop application and paste the Jellyfish API token and Hugging Face API Token when prompted.
-5. That's it!
-
-### All Other Host Applications
-
-For Claude Code, VSCode, Cursor, and all other host applications, you need to set up the server locally first, then configure your specific application. Prerequisites: Node.js (v18 or later).
-
-#### Local Setup:
-1. Clone this repository:
-```bash
-git clone [repository-url]
-cd jellyfish-mcp
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Understand the environment variables: There is no action required in this step, but you will need to configure these environment variables when setting up your host application. `JELLYFISH_API_TOKEN` is the only required environment variable. The remaining three are optional and correspond to PromptGuard, which uses Meta's Llama PromptGuard 2 model to help mitigate prompt injection attacks.
+It's important to know about the environment variables since you will need to configure them when setting up the Jellyfish MCP. `JELLYFISH_API_TOKEN` is the only required environment variable. The remaining three are optional and correspond to PromptGuard, which uses Meta's Llama PromptGuard 2 model to help mitigate prompt injection attacks.
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
@@ -120,6 +96,126 @@ npm install
 | `MODEL_AVAILABILITY` | Controls behavior when PromptGuard cannot be reached (service unavailable, timeout, or invalid token). Set to `true` to allow data if PromptGuard cannot be reached. Set to `false` to block data until PromptGuard can verify response. | No | `false` |
 | `MODEL_TIMEOUT` | How long to wait for the PromptGuard model to respond, in seconds. | No | `10` |
 
+
+### Installation - Option A: Claude Desktop Extension Setup
+
+1. Download the `jellyfish-mcp.mcpb` extension from the [Releases](https://github.com/Jellyfish-AI/jellyfish-mcp/releases) page by clicking on the file name.
+2. Once downloaded, double click the file.
+3. If the Claude Desktop application doesn't open automatically, open it manually.
+4. Follow the instructions and enter your Jellyfish API token (required) and Hugging Face API token (optional).
+5. That's it!
+
+
+### Installation - Option B: Docker Setup
+
+Docker runs the MCP server in an isolated container, so you don't need to install Node.js or manage dependencies on your machine.
+
+Prerequisites: Docker
+
+#### Claude Code:
+1. Run the following command in your terminal:
+```bash
+claude mcp add --transport stdio jellyfish-mcp -- docker run -i --rm --pull always -e JELLYFISH_API_TOKEN -e HUGGINGFACE_API_TOKEN -e MODEL_AVAILABILITY -e MODEL_TIMEOUT jellyfishco/jellyfish-mcp:latest
+```
+2. Open the `.claude.json` file that was modified and add the `env` block to the `jellyfish-mcp` entry:
+```json
+"mcpServers": {
+  "jellyfish-mcp": {
+    "command": "docker",
+    "args": [
+      "run", "-i", "--rm",
+      "--pull", "always",
+      "-e", "JELLYFISH_API_TOKEN",
+      "-e", "HUGGINGFACE_API_TOKEN",
+      "-e", "MODEL_AVAILABILITY",
+      "-e", "MODEL_TIMEOUT",
+      "jellyfishco/jellyfish-mcp:latest"
+    ],
+    "env": {
+      "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+      "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+      "MODEL_AVAILABILITY": "true_or_false",
+      "MODEL_TIMEOUT": "seconds"
+    }
+  }
+}
+```
+3. Run `claude mcp list` to verify the server is connected.
+
+#### VSCode:
+1. Open the _Command Palette..._ (_View_ → _Command Palette..._ on macOS)
+2. Search for _MCP: Add Server..._ and press Enter
+3. Select _Docker Image_
+4. Enter `jellyfishco/jellyfish-mcp:latest` as the image name and press Enter
+5. Open the generated config file (`.vscode/mcp.json`) and update it to:
+```json
+{
+  "servers": {
+    "jellyfish-mcp": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "--pull", "always",
+        "-e", "JELLYFISH_API_TOKEN",
+        "-e", "HUGGINGFACE_API_TOKEN",
+        "-e", "MODEL_AVAILABILITY",
+        "-e", "MODEL_TIMEOUT",
+        "jellyfishco/jellyfish-mcp:latest"
+      ],
+      "env": {
+        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+        "MODEL_AVAILABILITY": "true_or_false",
+        "MODEL_TIMEOUT": "seconds"
+      }
+    }
+  },
+  "inputs": []
+}
+```
+
+#### Cursor:
+1. Go to _Cursor Settings_ (_Cursor_ → _Settings..._ → _Cursor Settings_ on macOS)
+2. Go to _Tools & MCP_ and select _Add Custom MCP_
+3. Add the following to `mcp.json`:
+```json
+{
+  "mcpServers": {
+    "jellyfish-mcp": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "--pull", "always",
+        "-e", "JELLYFISH_API_TOKEN",
+        "-e", "HUGGINGFACE_API_TOKEN",
+        "-e", "MODEL_AVAILABILITY",
+        "-e", "MODEL_TIMEOUT",
+        "jellyfishco/jellyfish-mcp:latest"
+      ],
+      "env": {
+        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+        "MODEL_AVAILABILITY": "true_or_false",
+        "MODEL_TIMEOUT": "seconds"
+      }
+    }
+  }
+}
+```
+
+### Installation - Option C: Local Setup
+
+Run the MCP server directly on your machine. Use this if you want more control or want to modify the source code.
+
+Prerequisites: Node.js (v18 or later)
+
+Clone and install:
+```bash
+git clone https://github.com/Jellyfish-AI/jellyfish-mcp.git
+cd jellyfish-mcp
+npm install
+```
 
 #### Claude Code:
 1. Run the following command in your terminal:
@@ -146,9 +242,8 @@ claude mcp add --transport stdio jellyfish-mcp -- node /ABSOLUTE/PATH/TO/jellyfi
 ```
 3. Run `claude mcp list` to verify the server is connected.
 
-
 #### VSCode:
-1. Open the _Command Palette..._ (_View_ → _Command Palette..._ on Mac OS)
+1. Open the _Command Palette..._ (_View_ → _Command Palette..._ on macOS)
 2. Search for _MCP: Add Server..._ and press Enter
 3. Select _Command (stdio)_
 4. Enter `node /ABSOLUTE/PATH/TO/jellyfish-mcp/server/index.js` and press Enter
@@ -175,9 +270,8 @@ claude mcp add --transport stdio jellyfish-mcp -- node /ABSOLUTE/PATH/TO/jellyfi
 }
 ```
 
-
 #### Cursor:
-1. Go to _Cursor Settings_ (_Cursor_ → _Settings..._ → _Cursor Settings_ on Mac OS)
+1. Go to _Cursor Settings_ (_Cursor_ → _Settings..._ → _Cursor Settings_ on macOS)
 2. Go to _Tools & MCP_ and select _Add Custom MCP_
 3. Add the following to `mcp.json` (with the appropriate paths):
 ```json
@@ -206,6 +300,7 @@ If you encounter issues:
 1. Verify your API token is correct and has the necessary permissions
 2. Ensure your Jellyfish instance is accessible from your machine
 3. Check that the paths in your config files are absolute and correct
+4. For Docker, ensure Docker is running (`docker info` to check)
 
 ## License
 
