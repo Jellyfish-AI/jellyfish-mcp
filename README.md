@@ -1,4 +1,8 @@
-# jellyfish-mcp: A Jellyfish MCP Server
+# Jellyfish MCP Server
+
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Docker Hub](https://img.shields.io/docker/v/jellyfishco/jellyfish-mcp?label=Docker%20Hub)](https://hub.docker.com/r/jellyfishco/jellyfish-mcp)
+[![GitHub release](https://img.shields.io/github/v/release/Jellyfish-AI/jellyfish-mcp)](https://github.com/Jellyfish-AI/jellyfish-mcp/releases)
 
 > **Security Notice**: There are known risks and inherent limitations in this implementation. Refer to `SECURITY.md` before using.
 
@@ -87,7 +91,7 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 There are _three_ different ways to connect to the Jellyfish MCP: A) Claude Desktop Extension, B) Docker, or C) Locally. The easiest and recommended approach is with Claude Desktop using the Desktop Extension. For all other host applications (Claude Code, VSCode, Cursor, etc), you can use either Docker or Local Setup. Docker is recommended since it doesn't require Node.js or managing dependencies. Use the local setup if you want more control or want to modify the source code.
 
-It's important to know about the environment variables since you will need to configure them when setting up the Jellyfish MCP. `JELLYFISH_API_TOKEN` is the only required environment variable. The remaining three are optional and correspond to PromptGuard, which uses Meta's Llama PromptGuard 2 model to help mitigate prompt injection attacks.
+It's important to know about the environment variables since you will need to configure them when setting up the Jellyfish MCP. `JELLYFISH_API_TOKEN` is the only required environment variable. The remaining three are optional and correspond to PromptGuard, which uses Meta's Llama PromptGuard 2 model to help mitigate prompt injection attacks. If you choose not to use PromptGuard, simply remove the environment variables from your `.claude.json`/`mcp.json` file.
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
@@ -145,35 +149,14 @@ claude mcp add --transport stdio jellyfish-mcp -- docker run -i --rm --pull alwa
 #### VSCode:
 1. Open the _Command Palette..._ (_View_ → _Command Palette..._ on macOS)
 2. Search for _MCP: Add Server..._ and press Enter
-3. Select _Docker Image_
-4. Enter `jellyfishco/jellyfish-mcp:latest` as the image name and press Enter
-5. Open the generated config file (`.vscode/mcp.json`) and update it to:
-```json
-{
-  "servers": {
-    "jellyfish-mcp": {
-      "type": "stdio",
-      "command": "docker",
-      "args": [
-        "run", "-i", "--rm",
-        "--pull", "always",
-        "-e", "JELLYFISH_API_TOKEN",
-        "-e", "HUGGINGFACE_API_TOKEN",
-        "-e", "MODEL_AVAILABILITY",
-        "-e", "MODEL_TIMEOUT",
-        "jellyfishco/jellyfish-mcp:latest"
-      ],
-      "env": {
-        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
-        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
-        "MODEL_AVAILABILITY": "true_or_false",
-        "MODEL_TIMEOUT": "seconds"
-      }
-    }
-  },
-  "inputs": []
-}
-```
+3. Select _Docker Image_ and press Enter
+4. Enter `jellyfishco/jellyfish-mcp` as the image name and press Enter
+5. Select _Allow_ and press Enter
+6. Enter your Jellyfish API token and press Enter
+7. Optionally, enter your Hugging Face API token and press Enter
+8. Optionally, enter `true` or `false` for model availability and press Enter
+9. Optionally, enter an integer (seconds) for model timeout and press Enter
+10. Enter `jellyfish-mcp` as the server ID and press Enter
 
 #### Cursor:
 1. Go to _Cursor Settings_ (_Cursor_ → _Settings..._ → _Cursor Settings_ on macOS)
