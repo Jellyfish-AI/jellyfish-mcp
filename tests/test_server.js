@@ -11,6 +11,7 @@
 
 import { describe, it, mock, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
+import { sample_prompts } from './sample_prompts.js';
 
 // ============================================================================
 // API MODULE TESTS (server/api.js)
@@ -183,6 +184,8 @@ describe('API Module', async () => {
 // ============================================================================
 
 describe('Sanitizer Module', async () => {
+  const realFetch = global.fetch;
+  const realHFToken = process.env.HUGGINGFACE_API_TOKEN;
   let originalFetch;
 
   beforeEach(() => {
@@ -206,7 +209,7 @@ describe('Sanitizer Module', async () => {
     // Mock PromptGuard returning a low risk score
     global.fetch = mock.fn(async () => ({
       ok: true,
-      json: async () => [[{}, { score: 0.1 }]]  // Low score = safe
+      json: async () => [[{ label: 'LABEL_0', score: 0.9 }, { label: 'LABEL_1', score: 0.1 }]]  // Low injection score = safe
     }));
 
     const { sanitize_api_response } = await import('../server/sanitizer.js?' + Date.now());
@@ -228,7 +231,7 @@ describe('Sanitizer Module', async () => {
     // Mock PromptGuard returning a high risk score
     global.fetch = mock.fn(async () => ({
       ok: true,
-      json: async () => [[{}, { score: 0.95 }]]  // High score = risky
+      json: async () => [[{ label: 'LABEL_0', score: 0.05 }, { label: 'LABEL_1', score: 0.95 }]]  // High injection score = risky
     }));
 
     const { sanitize_api_response } = await import('../server/sanitizer.js?' + Date.now());
@@ -257,6 +260,30 @@ describe('Sanitizer Module', async () => {
     const result = await sanitize_api_response('test data');
 
     assert.strictEqual(result.approved, false, 'Should block when service unavailable and MODEL_AVAILABILITY=false');
+  });
+
+  /**
+   * Test: Sanitizer catches malicious payloads via live PromptGuard API
+   *
+   * Why: Validates that the PromptGuard model correctly identifies prompt
+   * injection attempts in API response data. Requires HUGGINGFACE_API_TOKEN.
+   */
+  it('should allow safe data and block malicious data (live API)', { skip: !realHFToken }, async () => {
+    process.env.HUGGINGFACE_API_TOKEN = realHFToken;
+
+    // Use real fetch (not mocked) to hit live PromptGuard API
+    global.fetch = realFetch;
+
+    const { sanitize_api_response } = await import('../server/sanitizer.js?' + Date.now());
+
+    for (const testCase of sample_prompts) {
+      const result = await sanitize_api_response(testCase.prompt);
+      if (testCase.expected === 'safe') {
+        assert.strictEqual(result.approved, true, `Safe data should be approved: "${testCase.prompt}"`);
+      } else {
+        assert.strictEqual(result.approved, false, `Dangerous data should be blocked: "${testCase.prompt}"`);
+      }
+    }
   });
 
   /**

@@ -20,7 +20,7 @@ const PROMPT_GUARD_UNAVAILABLE = process.env.MODEL_AVAILABILITY === 'true';
 const PROMPT_GUARD_TIMEOUT = process.env.MODEL_TIMEOUT || 10;
 
 // Get Hugging Face PromptGuard API URL
-const PROMPT_GUARD_URL = "https://router.huggingface.co/hf-inference/models/meta-llama/Llama-Prompt-Guard-2-86M";
+const PROMPT_GUARD_URL = "https://router.huggingface.co/hf-inference/models/meta-llama/Llama-Prompt-Guard-2-22M";
 
 // Get headers for API requests
 const HEADERS = {
@@ -49,8 +49,8 @@ async function query_prompt_guard(data) {
         if (response.ok) {
             const result = await response.json();
 
-            // Check the PromptGuard score
-            const score = result[0][1].score;
+            // Check the PromptGuard injection score (LABEL_1 = injection)
+            const score = result[0].find(r => r.label === 'LABEL_1').score;
 
             if (score <= 0.9) {
                 return RESPONSE_TYPES.PASSED;

@@ -80,7 +80,7 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 `jellyfish-mcp` supports using Meta's Llama PromptGuard 2 model to reduce the likelihood of prompt injections attacks. To set it up, follow these steps.
 
 1. Create an account on [Hugging Face](https://huggingface.co).
-2. Navigate to the [PromptGuard 2 86M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-86M).
+2. Navigate to the [PromptGuard 2 22M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-22M).
 3. Accept Meta's terms and request access to Llama models.
 4. Wait until you are granted access.
 5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) that is a `fine-grained` token with `Make calls to Inference Providers` permissions.
