@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Jellyfish Allocations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0D062B;
+    --card: #1a1340;
+    --border: #2D2749;
+    --fg: #FFFFFF;
+    --muted: #B7B3C4;
+    --muted-2: #DEDDE2;
+    --dim: #726C89;
+    --accent: #7319F2;
+    --accent-2: #8F47F5;
+    --teal: #13E2BF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family:"Source Sans Pro","Segoe UI",Tahoma,Arial,sans-serif; background:var(--bg); color:var(--fg); min-height:100vh; }
+  .wrap { max-width:1100px; margin:0 auto; padding:32px 24px; }
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; gap:16px; flex-wrap:wrap; }
+  h1 { font-size:24px; font-weight:700; margin:0; letter-spacing:-0.01em; }
+  .controls { display:flex; gap:12px; align-items:center; font-size:14px; color:var(--muted); flex-wrap:wrap; }
+  button {
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--accent); color:#fff; font-family:inherit; font-weight:600;
+    border:0; border-radius:8px; padding:10px 18px; font-size:14px; cursor:pointer;
+    transition: background 0.15s;
+  }
+  button:hover:not(:disabled) { background: var(--accent-2); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  select {
+    font-family:inherit; font-size:14px; padding:9px 12px;
+    border:1px solid var(--border); border-radius:8px;
+    background:var(--card); color:var(--fg); cursor:pointer;
+  }
+  select:focus { outline:none; border-color:var(--accent); }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:24px; }
+  .card h2 { font-size:12px; font-weight:600; margin:0 0 16px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+  .err { color:#ff7b72; font-size:13px; margin-bottom:12px; padding:10px 14px; background:rgba(255,123,114,0.08); border:1px solid rgba(255,123,114,0.3); border-radius:8px; }
+  .status { font-size:13px; color:var(--dim); }
+  .loader { text-align:center; padding:80px 0; color:var(--muted); font-size:14px; }
+  .no-data { text-align:center; padding:80px 0; color:var(--dim); font-size:14px; }
+</style>
+<!-- TEAM_PICKER -->
+</head>
+<body>
+<div id="root"></div>
+<a id="debug-toggle" href="#" style="display:block;margin:12px;font-size:12px;color:#726C89;font-family:ui-monospace,Menlo,monospace;text-decoration:none;">Show Console</a>
+<pre id="debug-log" style="display:none;background:#0b1020;color:#d6e6ff;padding:12px;margin:12px;border-radius:6px;font-size:11px;line-height:1.4;white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;max-height:240px;overflow:auto;"></pre>
+<script>
+(function () {
+  const el = document.getElementById("debug-log");
+  const toggle = document.getElementById("debug-toggle");
+  toggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    const visible = el.style.display !== "none";
+    el.style.display = visible ? "none" : "block";
+    toggle.textContent = visible ? "Show Console" : "Hide Console";
+  });
+  function fmt(args) {
+    return Array.from(args).map(a => {
+      if (a instanceof Error) return (a.stack || a.message);
+      if (typeof a === "object") { try { return JSON.stringify(a, null, 2); } catch { return String(a); } }
+      return String(a);
+    }).join(" ");
+  }
+  function append(level, args) {
+    const time = new Date().toISOString().slice(11, 19);
+    const colors = { log: "#d6e6ff", info: "#7ee787", warn: "#f1c40f", error: "#ff7b72" };
+    const line = document.createElement("div");
+    line.style.color = colors[level] || "#d6e6ff";
+    line.textContent = `[${time}] ${level.toUpperCase()} ${fmt(args)}`;
+    el.appendChild(line);
+    el.scrollTop = el.scrollHeight;
+  }
+  ["log", "info", "warn", "error"].forEach(level => {
+    const orig = console[level].bind(console);
+    console[level] = function (...args) { append(level, args); orig(...args); };
+  });
+  window.addEventListener("error", (e) => append("error", ["JS ERROR:", e.message, e.error?.stack || ""]));
+  window.addEventListener("unhandledrejection", (e) => append("error", ["PROMISE REJECTION:", e.reason?.message || e.reason, e.reason?.stack || ""]));
+  console.log("debug log ready");
+})();
+</script>
+
+
+<script type="importmap">
+{ "imports": {
+  "react": "https://esm.sh/react@18.3.1",
+  "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+  "recharts": "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1",
+  "@modelcontextprotocol/ext-apps/app-with-deps": "https://esm.sh/@modelcontextprotocol/ext-apps@1.6.0/app-with-deps"
+}}
+</script>
+
+<script type="module">
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
+} from "recharts";
+import { App } from "@modelcontextprotocol/ext-apps/app-with-deps";
+
+const h = React.createElement;
+const COLORS = ["#13E2BF","#7319F2","#8F47F5","#06b6d4","#f59e0b","#ec4899","#84cc16","#6366f1","#ef4444","#f43f5e","#14b8a6","#f97316"];
+
+// MCP Apps bridge - the host pushes the initial tool result via ontoolresult,
+// and we can re-fetch by calling allocations_by_investment_category_team through callServerTool.
+const mcp = new App({ name: "Jellyfish Allocations Chart", version: "1.0.0" }, {
+  serverTools: {},
+});
+const mcpReady = mcp.connect().catch(err => {
+  console.error("MCP App connect failed", err);
+});
+
+function defaultRange() {
+  const end = new Date();
+  const start = new Date(); start.setDate(end.getDate() - 90);
+  const fmt = (d) => d.toISOString().slice(0,10);
+  return { start_date: fmt(start), end_date: fmt(end), unit: "month" };
+}
+
+function extractEntries(result) {
+  // Accepts either a raw API payload or a CallToolResult from the host.
+  if (!result) return [];
+  const payload = result.structuredContent ?? result;
+  if (Array.isArray(payload)) return payload;
+  return payload?.entries || payload?.data || [];
+}
+
+// API returns top-level entries = monthly buckets, each { timeframe:{start,end}, entries:[{ftes, team:{name}, investment_category:{name}}] }
+function fmtMonth(iso) {
+  if (!iso) return "";
+  const [y,m] = iso.split("-");
+  return new Date(Number(y), Number(m)-1, 1).toLocaleString("en-US", { month: "short", year: "2-digit" });
+}
+
+function rowsFromBuckets(buckets) {
+  const keySet = new Set();
+  const rows = (buckets || []).map(b => {
+    const row = { month: fmtMonth(b?.timeframe?.start) };
+    for (const e of (b?.entries || [])) {
+      const cat = e?.investment_category?.name || "Other";
+      const fte = typeof e?.ftes === "number" ? e.ftes : 0;
+      if (fte === 0) continue;
+      keySet.add(cat);
+      row[cat] = Number(((row[cat] || 0) + fte).toFixed(2));
+    }
+    return row;
+  });
+  return { rows, keys: [...keySet] };
+}
+
+// --- Team picker hook (provided by team-picker-snippet.html) ---
+function useTeamPicker(onPick) {
+  const [teams, setTeams] = useState([]);
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        await mcpReady;
+        const result = await mcp.callServerTool({ name: "team_picker", arguments: {} });
+        const payload = result?.structuredContent ?? result;
+        setTeams((payload?.teams || []).filter(t => t.name));
+      } catch (e) { console.error("team load failed:", e); }
+    })();
+  }, []);
+
+  const pickTeam = useCallback(async (teamName) => {
+    setSelected(teamName);
+    if (onPick) onPick(teamName);
+  }, [onPick]);
+
+  const render = () => teams.length > 0 && h("select", {
+    className: "team-select",
+    value: selected || "__all__",
+    onChange: (e) => pickTeam(e.target.value === "__all__" ? null : e.target.value)
+  },
+    h("option", { value: "__all__" }, "All teams"),
+    teams.map(t => h("option", { key: t.id, value: t.name }, t.name))
+  );
+
+  return { teams, selected, setSelected, pickTeam, render };
+}
+
+function App_() {
+  const [buckets, setBuckets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(null);
+  const [updated, setUpdated] = useState(null);
+
+  const applyResult = useCallback((result) => {
+    try {
+      const entries = extractEntries(result);
+      console.log("got monthly buckets:", entries.length);
+      setBuckets(entries);
+      setUpdated(new Date());
+      setErr(null);
+    } catch (e) {
+      console.error("applyResult error:", e);
+      setErr(String(e.message || e));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchChart = useCallback(async (teamName) => {
+    setLoading(true); setErr(null);
+    try {
+      await mcpReady;
+      const args = teamName ? { team_name: teamName } : {};
+      const result = await mcp.callServerTool({ name: "allocations_chart", arguments: args });
+      applyResult(result);
+    } catch (e) {
+      console.error("fetch failed:", e);
+      setErr(String(e.message || e));
+      setLoading(false);
+    }
+  }, [applyResult]);
+
+  const teamPicker = useTeamPicker((teamName) => fetchChart(teamName));
+
+  useEffect(() => {
+    mcp.ontoolresult = (result) => {
+      applyResult(result);
+      const params = result?.structuredContent?.params;
+      if (params?.team_name) teamPicker.setSelected(params.team_name);
+    };
+  }, [applyResult]);
+
+  const { rows, keys } = useMemo(() => rowsFromBuckets(buckets), [buckets]);
+
+  return h("div", { className:"wrap" },
+    h("header", null,
+      h("h1", null, "Allocations by Investment Category"),
+      h("div", { className:"controls" },
+        teamPicker.render(),
+        updated && h("span", { className:"status" }, `Updated ${updated.toLocaleTimeString()}`),
+        h("button", { onClick:() => fetchChart(teamPicker.selected), disabled:loading }, loading ? "Loading\u2026" : "Refresh"),
+      ),
+    ),
+    err && h("div", { className:"err" }, "Error: ", err),
+    h("div", { className:"card" },
+      h("h2", null, "FTE / month"),
+      loading && h("div", { className:"loader" }, "Loading\u2026"),
+      !loading && rows.length === 0 && h("div", { className:"no-data" }, "No data available"),
+      !loading && rows.length > 0 && h(ResponsiveContainer, { width:"100%", height:380 },
+        h(BarChart, { data:rows, margin:{ top:8, right:16, left:0, bottom:32 } },
+          h(CartesianGrid, { strokeDasharray:"3 3", stroke:"#2D2749" }),
+          h(XAxis, { dataKey:"month", tick:{ fontSize:12, fill:"#B7B3C4" }, axisLine:{ stroke:"#2D2749" }, tickLine:{ stroke:"#2D2749" } }),
+          h(YAxis, { tick:{ fontSize:12, fill:"#B7B3C4" }, axisLine:{ stroke:"#2D2749" }, tickLine:{ stroke:"#2D2749" } }),
+          h(Tooltip, { contentStyle:{ background:"#1a1340", border:"1px solid #2D2749", borderRadius:6, color:"#fff", fontSize:12 }, cursor:{ fill:"rgba(115,25,242,0.08)" } }),
+          h(Legend, { wrapperStyle:{ fontSize:12, color:"#DEDDE2", paddingTop:8 } }),
+          keys.map((k,i) => h(Bar, {
+            key:k, dataKey:k, stackId:"a", fill: COLORS[i % COLORS.length],
+            cursor:"pointer",
+            onClick: async (data) => {
+              try {
+                await mcpReady;
+                const month = data?.month || "";
+                const fte = data?.[k] ?? "";
+                await mcp.sendMessage({
+                  role: "user",
+                  content: [{ type: "text", text: `Drill into ${k} for ${month} (${fte} FTE) — show me who's allocated and what they're working on` }]
+                });
+              } catch (e) { console.error("sendMessage failed:", e); }
+            }
+          }))
+        )
+      )
+    )
+  );
+}
+
+createRoot(document.getElementById("root")).render(h(App_));
+</script>
+</body>
+</html>

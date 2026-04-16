@@ -14,6 +14,17 @@ import {
 import * as api from "./api.js";
 import { encode } from '@toon-format/toon';
 import { sanitize_api_response } from './sanitizer.js';
+import {
+    ALLOCATIONS_CHART_UI_URI,
+    ALLOCATIONS_CHART_HTML,
+    ALLOCATIONS_CHART_META,
+    ChartParams,
+    handleAllocationsChart,
+} from './apps/allocations_chart.js';
+import {
+    TeamsParams,
+    handleTeamPicker,
+} from './apps/team_picker.js';
 
 // Get version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -136,7 +147,13 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
                 mimeType: "application/json",
                 name: "api_schema",
                 description: "Get the complete API schema with all available endpoints"
-            }
+            },
+            {
+                uri: ALLOCATIONS_CHART_UI_URI,
+                mimeType: "text/html;profile=mcp-app",
+                name: "allocations_chart_ui",
+                description: "Interactive allocations-by-investment-category chart (MCP App UI resource)."
+            },
         ]
     };
 });
@@ -146,6 +163,16 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     if (request.params.uri == "schema://api") {
         const data = await api.api_get_api_schema();
         return process_resource_response("schema://api", data);
+    }
+    if (request.params.uri == ALLOCATIONS_CHART_UI_URI) {
+        return {
+            contents: [{
+                uri: ALLOCATIONS_CHART_UI_URI,
+                mimeType: "text/html;profile=mcp-app",
+                text: ALLOCATIONS_CHART_HTML,
+                _meta: ALLOCATIONS_CHART_META
+            }]
+        };
     }
     throw new Error(`Unknown resource: ${request.params.uri}`);
 });
@@ -572,6 +599,26 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     },
                     required: []
                 }
+            },
+            // MCP APP (interactive UI)
+            {
+                name: "allocations_chart",
+                description: "Renders an interactive bar chart of allocations by investment category (scoped by team) inline in the chat via an MCP App UI resource. Use this when the user asks to see or visualize an allocations chart.",
+                inputSchema: {
+                    type: "object",
+                    properties: ChartParams.properties(),
+                    required: []
+                },
+                _meta: ALLOCATIONS_CHART_META
+            },
+            {
+                name: "team_picker",
+                description: "Returns the list of teams at a given hierarchy level as structured JSON. Used by the allocations chart to populate its team dropdown.",
+                inputSchema: {
+                    type: "object",
+                    properties: TeamsParams.properties(),
+                    required: []
+                }
             }
         ]
     };
@@ -643,7 +690,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             return process_tool_response(await api.api_list_teams(params));
         case "search_teams":
             return process_tool_response(await api.api_search_teams(params));
-        
+
+        // MCP APP (interactive UI) — logic in allocations_chart.js
+        case "allocations_chart":
+            return handleAllocationsChart(new ChartParams(params));
+        case "team_picker":
+            return handleTeamPicker(new TeamsParams(params));
+
         default:
             throw new Error(`Unknown tool: ${request.params.name}`);
     }

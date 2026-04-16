@@ -1,0 +1,14 @@
+<!-- Reusable team picker snippet.
+     Injected into MCP App HTML via TEAM_PICKER placeholder.
+     Requires: mcp, mcpReady, h, useState, useEffect, useCallback
+     in the host module scope.
+     Provides: useTeamPicker() hook that returns { teams, selected, render }. -->
+
+<style>
+  .team-select {
+    font-family:inherit; font-size:14px; font-weight:600;
+    padding:9px 12px; border-radius:8px; cursor:pointer;
+    border:1px solid var(--border); background:var(--card); color:var(--fg);
+  }
+  .team-select:focus { outline:none; border-color:var(--accent); }
+</style>
