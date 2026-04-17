@@ -23,6 +23,15 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 - `get_api_schema` - Retrieves the complete API schema with all available API endpoints
 
+#### AI Impact
+
+- `ai_company_adoption_analytics`
+- `ai_company_impact_analytics`
+- `ai_person_adoption`
+- `ai_person_adoption_analytics`
+- `ai_team_adoption_analytics`
+- `ai_team_impact_analytics`
+
 #### Allocations
 
 - `allocations_by_person`

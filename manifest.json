@@ -2,9 +2,9 @@
   "manifest_version": "0.3",
   "name": "jellyfish-mcp",
   "display_name": "Jellyfish MCP",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Connect to your Jellyfish Software Engineering Intelligence platform for comprehensive team insights, effort allocation, and delivery metrics.",
-  "long_description": "The Jellyfish MCP allows access to your engineering organization's data through 25 specialized tools. Query allocations by person, team, or investment category; track delivery metrics and scope changes; analyze sprint performance; search people and teams; and browse work categories and deliverables. Get instant insights into engineering productivity, resource allocation patterns, and project delivery timelines. Perfect for engineering managers, team leads, and executives who need data-driven insights about their organization's development processes. Supports Llama PromptGuard 2 which can detect responses from the Jellyfish API that might include prompt injection attacks. It is *highly* recommend to configure before using daily.\n\n**Jellyfish Setup (required):** Generate an API token from your Jellyfish instance (requires Admin User Role to access)\n1. Go to the [API Export](https://app.jellyfish.co/settings/data-connections/api-export) tab on the Data Connections page.\n2. Click Generate New Token.\n3. In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog.\n4. Copy the token and paste it when prompted.\n\n**PromptGuard Setup (optional):** Generate an API token for prompt injection mitigation\n1. Create an account on [Hugging Face](https://huggingface.co).\n2. Navigate to the [PromptGuard 2 22M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-22M).\n3. Access Meta's terms and request access to Llama models.\n4. Wait until you are granted access.\n5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) that is a `fine-grained` token with `Make calls to Inference Providers` permissions.\n6. Copy the token and paste it when prompted.\n\n**Security Notice**: There are known risks and inherent limitations in this implementation. Refer to [`SECURITY.md`](https://github.com/Jellyfish-AI/jellyfish-mcp/blob/main/SECURITY.md) before using.",
+  "long_description": "The Jellyfish MCP allows access to your engineering organization's data through 31 specialized tools. Query allocations by person, team, or investment category; track delivery metrics and scope changes; analyze sprint performance; search people and teams; and browse work categories and deliverables. Get instant insights into engineering productivity, resource allocation patterns, and project delivery timelines. Perfect for engineering managers, team leads, and executives who need data-driven insights about their organization's development processes. Supports Llama PromptGuard 2 which can detect responses from the Jellyfish API that might include prompt injection attacks. It is *highly* recommend to configure before using daily.\n\n**Jellyfish Setup (required):** Generate an API token from your Jellyfish instance (requires Admin User Role to access)\n1. Go to the [API Export](https://app.jellyfish.co/settings/data-connections/api-export) tab on the Data Connections page.\n2. Click Generate New Token.\n3. In the Generate New Token dialog, select a Time To Live value and click Generate. A new token is created and displayed in the dialog.\n4. Copy the token and paste it when prompted.\n\n**PromptGuard Setup (optional):** Generate an API token for prompt injection mitigation\n1. Create an account on [Hugging Face](https://huggingface.co).\n2. Navigate to the [PromptGuard 2 22M model](https://huggingface.co/meta-llama/Llama-Prompt-Guard-2-22M).\n3. Access Meta's terms and request access to Llama models.\n4. Wait until you are granted access.\n5. Create a Hugging Face API token at [Hugging Face settings](https://huggingface.co/settings/tokens) that is a `fine-grained` token with `Make calls to Inference Providers` permissions.\n6. Copy the token and paste it when prompted.\n\n**Security Notice**: There are known risks and inherent limitations in this implementation. Refer to [`SECURITY.md`](https://github.com/Jellyfish-AI/jellyfish-mcp/blob/main/SECURITY.md) before using.",
   "author": {
     "name": "Jellyfish",
     "email": "ai@jellyfish.co",
@@ -39,6 +39,30 @@
     }
   },
   "tools": [
+    {
+      "name": "ai_company_adoption_analytics",
+      "description": "Returns per-tool AI adoption analytics aggregated across the entire company."
+    },
+    {
+      "name": "ai_company_impact_analytics",
+      "description": "Returns per-tool AI impact analytics aggregated across the entire company."
+    },
+    {
+      "name": "ai_person_adoption",
+      "description": "Returns per-tool AI adoption usage dates for the specified people."
+    },
+    {
+      "name": "ai_person_adoption_analytics",
+      "description": "Returns per-tool AI adoption analytics for the specified people."
+    },
+    {
+      "name": "ai_team_impact_analytics",
+      "description": "Returns per-tool AI impact analytics for the specified teams."
+    },
+    {
+      "name": "ai_team_adoption_analytics",
+      "description": "Returns per-tool AI adoption analytics aggregated by team."
+    },
     {
       "name": "allocations_by_person",
       "description": "Returns allocation data for the whole company, aggregated by person."
@@ -187,7 +211,8 @@
     "api",
     "data",
     "insights",
-    "management"
+    "management",
+    "ai"
   ],
   "license": "MIT"
 }

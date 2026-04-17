@@ -136,6 +136,37 @@ async function api_generic(endpoint, params = {}) {
     }
 }
 
+// --- AI IMPACT ---
+export async function api_ai_company_adoption_analytics(params = {}) {
+    const endpoint = "/endpoints/export/v0/ai_impact/company_adoption_analytics";
+    return await api_generic(endpoint, params);
+}
+
+export async function api_ai_company_impact_analytics(params = {}) {
+    const endpoint = "/endpoints/export/v0/ai_impact/company_impact_analytics";
+    return await api_generic(endpoint, params);
+}
+
+export async function api_ai_person_adoption(params = {}) {
+    const endpoint = "/endpoints/export/v0/ai_impact/person_adoption";
+    return await api_generic(endpoint, params);
+}
+
+export async function api_ai_person_adoption_analytics(params = {}) {
+    const endpoint = "/endpoints/export/v0/ai_impact/person_adoption_analytics";
+    return await api_generic(endpoint, params);
+}
+
+export async function api_ai_team_impact_analytics(params = {}) {
+    const endpoint = "/endpoints/export/v0/ai_impact/team_impact_analytics";
+    return await api_generic(endpoint, params);
+}
+
+export async function api_ai_team_adoption_analytics(params = {}) {
+    const endpoint = "/endpoints/export/v0/ai_impact/team_adoption_analytics";
+    return await api_generic(endpoint, params);
+}
+
 // --- ALLOCATIONS ---
 export async function api_allocations_by_person(params = {}) {
     const endpoint = "/endpoints/export/v0/allocations/details/by_person";
