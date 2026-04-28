@@ -8,7 +8,7 @@
 > **Security Notice**: There are known risks and inherent limitations in this implementation. Refer to [`SECURITY.md`](SECURITY.md) before using.
 
 > [!IMPORTANT]
-> PromptGuard is not bundled with this server. We recommend configuring it before using `jellyfish-mcp` daily — see [PROMPTGUARD.md](PROMPTGUARD.md) for setup and [SECURITY.md](SECURITY.md) for the threat model.
+> PromptGuard is not bundled with this server. We recommend configuring it before using `jellyfish-mcp` daily — see [PROMPTGUARD.md](PROMPTGUARD.md) for setup and [SECURITY.md](SECURITY.md) before using.
 
 ## Overview
 
