@@ -1,8 +1,50 @@
 {
   "name": "jellyfish-mcp-server",
-  "version": "1.0.3",
+  "version": "1.1.0",
+  "description": "Connect to your Jellyfish Software Engineering Intelligence platform for comprehensive team insights, effort allocation, and delivery metrics.",
+  "keywords": [
+    "jellyfish",
+    "mcp",
+    "model-context-protocol",
+    "engineering",
+    "analytics",
+    "team",
+    "allocation",
+    "metrics",
+    "delivery",
+    "devex",
+    "sprint",
+    "productivity",
+    "organization",
+    "api",
+    "data",
+    "insights",
+    "management"
+  ],
+  "homepage": "https://github.com/Jellyfish-AI/jellyfish-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/Jellyfish-AI/jellyfish-mcp/issues"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Jellyfish",
+    "email": "ai@jellyfish.co",
+    "url": "https://jellyfish.co/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jellyfish-AI/jellyfish-mcp.git"
+  },
   "type": "module",
   "main": "server/index.js",
+  "bin": {
+    "jellyfish-mcp-server": "server/index.js"
+  },
+  "files": [
+    "server/",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "test": "node --test tests/test_server.js"
   },

@@ -4,5 +4,8 @@ node_modules/
 # Desktop extension
 *.mcpb
 
+# npm pack output
+*.tgz
+
 # macOS
 .DS_Store
