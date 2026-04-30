@@ -154,6 +154,95 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
 server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
         tools: [
+            // AI IMPACT
+            {
+                name: "ai_company_adoption_analytics",
+                description: "Returns per-tool AI adoption analytics aggregated across the entire company, including cohort counts and average usage percentage.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        format: { type: "string", default: "json", description: "Response format" },
+                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
+                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
+                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" }
+                    },
+                    required: []
+                }
+            },
+            {
+                name: "ai_company_impact_analytics",
+                description: "Returns per-tool AI impact analytics aggregated across the entire company, including median issue cycle time, median PR cycle time, total PR throughput, and total AI adoption lines.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        format: { type: "string", default: "json", description: "Response format" },
+                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
+                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
+                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" }
+                    },
+                    required: []
+                }
+            },
+            {
+                name: "ai_person_adoption",
+                description: "Returns per-tool AI adoption usage dates for the specified people, with a breakdown by each configured tool.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        format: { type: "string", default: "json", description: "Response format" },
+                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
+                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
+                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                        person_id: { type: "array", items: {type: "integer"}, description: "List of person IDs" }
+                    },
+                    required: ["person_id"]
+                }
+            },
+            {
+                name: "ai_person_adoption_analytics",
+                description: "Returns per-tool AI adoption analytics for the specified people, including cohort and usage percentage.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        format: { type: "string", default: "json", description: "Response format" },
+                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
+                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
+                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                        person_id: { type: "array", items: {type: "integer"}, description: "List of person IDs" }
+                    },
+                    required: ["person_id"]
+                }
+            },
+            {
+                name: "ai_team_impact_analytics",
+                description: "Returns per-tool AI impact analytics for the specified teams, including median issue cycle time, median PR cycle time, and total PR throughput.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        format: { type: "string", default: "json", description: "Response format" },
+                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
+                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
+                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                        team_id: { type: "array", items: { type: "integer" }, description: "List of Jellyfish team IDs" }
+                    },
+                    required: ["team_id"]
+                }
+            },
+            {
+                name: "ai_team_adoption_analytics",
+                description: "Returns per-tool AI adoption analytics aggregated by team, including cohort counts and average usage percentage.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        format: { type: "string", default: "json", description: "Response format" },
+                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
+                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
+                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                        team_id: { type: "array", items: { type: "integer" }, description: "List of team IDs" }
+                    },
+                    required: ["team_id"]
+                }
+            },
             // ALLOCATIONS
             {
                 name: "allocations_by_person",
@@ -577,11 +666,25 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     };
 });
 
-// Handler to execute tool calls (processes requests for all 24 Jellyfish API tools)
+// Handler to execute tool calls
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const params = filter_params(request.params.arguments || {});
 
     switch (request.params.name) {
+        // AI IMPACT
+        case "ai_company_adoption_analytics":
+            return process_tool_response(await api.api_ai_company_adoption_analytics(params));
+        case "ai_company_impact_analytics":
+            return process_tool_response(await api.api_ai_company_impact_analytics(params));
+        case "ai_person_adoption":
+            return process_tool_response(await api.api_ai_person_adoption(params));
+        case "ai_person_adoption_analytics":
+            return process_tool_response(await api.api_ai_person_adoption_analytics(params));
+        case "ai_team_impact_analytics":
+            return process_tool_response(await api.api_ai_team_impact_analytics(params));
+        case "ai_team_adoption_analytics":
+            return process_tool_response(await api.api_ai_team_adoption_analytics(params));
+
         // ALLOCATIONS
         case "allocations_by_person":
             return process_tool_response(await api.api_allocations_by_person(params));
