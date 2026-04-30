@@ -43,7 +43,11 @@
   "files": [
     "server/",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "INSTALL.md",
+    "DEVELOPMENT.md",
+    "PROMPTGUARD.md",
+    "SECURITY.md"
   ],
   "scripts": {
     "test": "node --test tests/test_server.js"

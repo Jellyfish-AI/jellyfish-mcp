@@ -24,9 +24,9 @@ Generate an API token from your Jellyfish instance. Requires the Admin User Role
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
 | `JELLYFISH_API_TOKEN` | Your Jellyfish API token. | Yes | — |
-| `HUGGINGFACE_API_TOKEN` | Your Hugging Face API token. Enables PromptGuard. | No | — |
-| `MODEL_AVAILABILITY` | When PromptGuard is unreachable (timeout, invalid token), `true` allows data through, `false` blocks. | No | `false` |
-| `MODEL_TIMEOUT` | How long to wait for PromptGuard to respond, in seconds. | No | `10` |
+| `HUGGINGFACE_API_TOKEN` | Your Hugging Face token. PromptGuard is enabled when this is set. | No | — |
+| `MODEL_AVAILABILITY` | Behavior when PromptGuard can't be reached. `true` allows data through (fail-open). `false` blocks data until PromptGuard responds (fail-closed). | No | `false` |
+| `MODEL_TIMEOUT` | Seconds to wait for a PromptGuard response. | No | `10` |
 
 If `HUGGINGFACE_API_TOKEN` isn't set, PromptGuard is disabled and data is always returned without scanning.
 
@@ -39,7 +39,7 @@ Pick the section that matches the client you're using.
 - [Cursor](#cursor) — npx or Docker
 - [VSCode](#vscode) — npx or Docker
 
-> **npx or Docker?** Use npx unless you specifically prefer Docker — it's smaller, faster, and the config is shorter. Pick Docker if you already use it for tooling, your environment can't install Node.js, or you want container isolation.
+> **npx or Docker?** Use npx unless you specifically prefer Docker — it's smaller, faster, and the config is shorter. Pick Docker if you already use it for tooling, your environment can't install Node.js, or you want container isolation. To run from a local clone instead, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ### Claude Desktop
 

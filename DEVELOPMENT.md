@@ -103,6 +103,6 @@ In _Cursor Settings_ → _Tools & MCP_ → _Add Custom MCP_, edit `mcp.json`:
 
 - `server/` — the MCP server (entry point: `server/index.js`)
 - `tests/` — Node test suite
-- `manifest.json` — Claude Desktop Extension manifest (DXT)
+- `manifest.json` — Claude Desktop Extension manifest (.mcpb)
 - `Dockerfile` — Docker image build
 - `assets/` — extension icon and screenshots
