@@ -91,6 +91,16 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 - `list_teams`
 - `search_teams`
 
+## Skills
+
+In addition to the MCP tools above, the Jellyfish MCP pairs with optional Agent Skills. Skills can similarly be invoked throughout the chat conversation, but are not bundled with the MCP and need to be independently installed. To install, go to the [`skills/`](skills/) directory and add each Skill individually to your host application.
+
+### Dashboards
+
+- `jellyfish-custom-dashboards` — Generate branded HTML dashboards from Jellyfish engineering analytics. Currently supports engineering investment reports.
+
+![Engineering Investment Dashboard](assets/engineering-investment.png)
+
 ## License
 
 This code is distributed under the MIT license. See [LICENSE](LICENSE).
