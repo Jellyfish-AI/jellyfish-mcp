@@ -136,14 +136,11 @@ Run `claude mcp list` to verify.
 
 ### VSCode
 
-**npx** — requires Node.js v18 or later.
+1. Open the _Command Palette..._ (Cmd/Ctrl+Shift+P).
+2. Run _MCP: Open User Configuration_. This opens your user `mcp.json`.
+3. Add the `jellyfish-mcp` server inside `servers` (use the block below) and save.
 
-1. Open the _Command Palette..._ (_View_ → _Command Palette..._ on macOS).
-2. Search for _MCP: Add Server..._ and press Enter.
-3. Select _Command (stdio)_.
-4. Enter `npx -y jellyfish-mcp-server` and press Enter.
-5. Enter `jellyfish-mcp` as the server name.
-6. Open the generated `.vscode/mcp.json` and add the `env` block:
+**npx** — requires Node.js v18 or later.
 
 ```json
 {
@@ -159,19 +156,38 @@ Run `claude mcp list` to verify.
         "MODEL_TIMEOUT": "10"
       }
     }
-  },
-  "inputs": []
+  }
 }
 ```
 
 **Docker** — requires Docker installed and running.
 
-1. Open the _Command Palette..._
-2. Search for _MCP: Add Server..._ and press Enter.
-3. Select _Docker Image_.
-4. Enter `jellyfishco/jellyfish-mcp` as the image name.
-5. Follow the prompts for each environment variable.
-6. Enter `jellyfish-mcp` as the server ID.
+```json
+{
+  "servers": {
+    "jellyfish-mcp": {
+      "type": "stdio",
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm", "--pull", "always",
+        "-e", "JELLYFISH_API_TOKEN",
+        "-e", "HUGGINGFACE_API_TOKEN",
+        "-e", "MODEL_AVAILABILITY",
+        "-e", "MODEL_TIMEOUT",
+        "jellyfishco/jellyfish-mcp:latest"
+      ],
+      "env": {
+        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+        "MODEL_AVAILABILITY": "false",
+        "MODEL_TIMEOUT": "10"
+      }
+    }
+  }
+}
+```
+
+> **Docker note:** each variable must also be passed through with `-e VARNAME` in `args` — values placed only in the `env` block are not forwarded into the container. Keep each `--flag value` pair together and list all `-e` flags before the image name.
 
 ## Troubleshooting
 
