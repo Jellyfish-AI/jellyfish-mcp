@@ -1,0 +1,66 @@
+{% extends "base.html.j2" %}
+
+{#
+  Engineering Investment report.
+
+  Every value below is rendered with autoescaping ON. `deliverable.url` is
+  already scheme-validated (http/https only) by the generator, so it is safe
+  to place in href. Never add `| safe` to any of these values.
+#}
+
+{% block summary %}
+  {% for item in summary_items %}
+  <div class="summary-item">
+    <div class="label">{{ item.label }}</div>
+    <div class="value">{{ item.value }}</div>
+    {% if item.desc %}<div class="desc">{{ item.desc }}</div>{% endif %}
+  </div>
+  {% endfor %}
+{% endblock %}
+
+{% block content %}
+  <div class="cards-grid">
+    {% for d in deliverables %}
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          {% if d.url %}<a href="{{ d.url }}">{{ d.name }}</a>{% else %}{{ d.name }}{% endif %}
+        </h3>
+        <span class="badge {{ d.badge_class }}">{{ d.status }}</span>
+      </div>
+
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="metric-label">Lifetime FTE</div>
+          <div class="metric-value">{{ d.lifetime_fte }}<span class="metric-unit">mo</span></div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Remaining FTE</div>
+          <div class="metric-value">{{ d.remaining_fte }}<span class="metric-unit">mo</span></div>
+        </div>
+      </div>
+
+      <div class="progress-section">
+        <div class="progress-header">
+          <span>Progress</span>
+          <span>{{ d.progress }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: {{ d.progress }}%"></div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+          {{ d.projected_date }}
+        </span>
+        <span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          {{ d.team_count }} team{{ '' if d.team_count == 1 else 's' }}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endblock %}

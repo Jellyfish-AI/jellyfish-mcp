@@ -1,4 +1,13 @@
 <!--
+  Jellyfish dashboard base template (Jinja2).
+
+  Brand tokens, page shell, and component CSS classes live here. Report
+  templates extend this file and fill in the `summary` and `content` blocks.
+
+  All dynamic values are rendered through Jinja2 with autoescaping ON, so
+  data coming from the Jellyfish API can never be interpreted as HTML/JS.
+  Do NOT use the `| safe` filter on any API-derived value.
+
   ANTI-PATTERNS — do not use:
   - No white/light backgrounds
   - No Bootstrap blue — use violet
@@ -12,12 +21,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{TITLE}}</title>
+<title>{{ title }}</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 275 330' fill='%237C3AED'><path d='M211.489 19.913C138.248 -21.6389 46.6404 3.87055 4.65734 77.5074C-4.91775 94.296 0.790481 115.748 17.3167 125.448C17.3167 125.448 26.4315 132.257 40.2417 142.097L14.5086 187.286C9.53696 196.007 12.4831 207.153 21.0915 212.189L24.1298 213.962C32.7381 218.998 43.7403 216.014 48.712 207.293L72.9719 164.762C81.3962 170.404 90.1426 176.141 98.8431 181.644L33.7509 295.853C28.7792 304.574 31.7254 315.719 40.3338 320.756L43.372 322.528C51.9804 327.565 62.9825 324.58 67.9542 315.859L133.046 201.65C142.069 206.547 151.368 211.397 160.391 215.967L117.349 291.516C112.377 300.237 115.323 311.382 123.932 316.419L126.97 318.191C135.578 323.228 146.58 320.243 151.552 311.522L196.113 233.315C211.442 240.497 221.8 245.067 221.8 245.067C238.372 254.767 259.548 248.985 269.123 232.243L270.274 230.237C312.81 155.621 285.88 62.1178 211.489 19.913Z'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script> <!-- pragma: allowlist secret -->
 <style>
 
   /* ========================================
@@ -345,6 +353,7 @@
   }
   .jf-chart__body { height: 240px; }
 
+  {% block extra_styles %}{% endblock %}
 </style>
 </head>
 <body>
@@ -354,20 +363,20 @@
   <!-- HEADER -->
   <div class="dashboard-header">
     <div>
-      <h1>{{TITLE}}</h1>
-      <div class="subtitle">{{SUBTITLE}}</div>
+      <h1>{{ title }}</h1>
+      <div class="subtitle">{{ subtitle }}</div>
     </div>
-    <div class="date-badge">As of {{DATE}}</div>
+    <div class="date-badge">As of {{ date }}</div>
   </div>
 
-  <!-- SUMMARY BAR — use as many summary-items as the report needs -->
+  <!-- SUMMARY BAR -->
   <div class="summary-bar">
-    <!-- {{SUMMARY_ITEMS}} -->
+    {% block summary %}{% endblock %}
   </div>
 
-  <!-- CONTENT AREA — each report builds this section using the components above -->
+  <!-- CONTENT AREA -->
   <main>
-    <!-- {{CONTENT}} -->
+    {% block content %}{% endblock %}
   </main>
 
   <footer class="jf-footer">
