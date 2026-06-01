@@ -1,6 +1,6 @@
 {
   "name": "jellyfish-mcp-server",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Connect to your Jellyfish Software Engineering Intelligence platform for comprehensive team insights, effort allocation, and delivery metrics.",
   "keywords": [
     "jellyfish",
@@ -19,7 +19,8 @@
     "api",
     "data",
     "insights",
-    "management"
+    "management",
+    "ai"
   ],
   "homepage": "https://github.com/Jellyfish-AI/jellyfish-mcp#readme",
   "bugs": {

@@ -162,6 +162,14 @@
     {
       "name": "search_teams",
       "description": "Searches for teams by name or id."
+    },
+    {
+      "name": "search_articles",
+      "description": "Searches Jellyfish help center articles by keyword."
+    },
+    {
+      "name": "get_article",
+      "description": "Retrieves the full content of a help center article by ID."
     }
   ],
   "user_config": {
@@ -197,6 +205,8 @@
   },
   "keywords": [
     "jellyfish",
+    "mcp",
+    "model-context-protocol",
     "engineering",
     "analytics",
     "team",
@@ -207,7 +217,6 @@
     "sprint",
     "productivity",
     "organization",
-    "mcp",
     "api",
     "data",
     "insights",

@@ -91,6 +91,11 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 - `list_teams`
 - `search_teams`
 
+### Help Center
+
+- `search_articles`
+- `get_article`
+
 ## License
 
 This code is distributed under the MIT license. See [LICENSE](LICENSE).
