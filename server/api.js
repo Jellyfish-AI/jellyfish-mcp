@@ -297,3 +297,15 @@ export async function api_search_teams(params = {}) {
     const endpoint = "/endpoints/export/v0/teams/search";
     return await api_generic(endpoint, params);
 }
+
+// --- HELP CENTER ---
+export async function api_search_articles(params = {}) {
+    const endpoint = "/endpoints/export/v0/mcp/help_center/search";
+    return await api_generic(endpoint, params);
+}
+
+export async function api_get_article(params = {}) {
+    const { article_id, ...rest } = params;
+    const endpoint = `/endpoints/export/v0/mcp/help_center/article/${article_id}`;
+    return await api_generic(endpoint, rest);
+}
