@@ -61,7 +61,7 @@ claude mcp add jellyfish-mcp \
   -e HUGGINGFACE_API_TOKEN=your_huggingface_token \
   -e MODEL_AVAILABILITY=false \
   -e MODEL_TIMEOUT=10 \
-  -- npx -y jellyfish-mcp-server
+  -- npx -y jellyfish-mcp-server@latest
 ```
 
 Run `claude mcp list` to verify.
@@ -96,7 +96,7 @@ Run `claude mcp list` to verify.
   "mcpServers": {
     "jellyfish-mcp": {
       "command": "npx",
-      "args": ["-y", "jellyfish-mcp-server"],
+      "args": ["-y", "jellyfish-mcp-server@latest"],
       "env": {
         "JELLYFISH_API_TOKEN": "your_jellyfish_token",
         "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
@@ -148,7 +148,7 @@ Run `claude mcp list` to verify.
     "jellyfish-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "jellyfish-mcp-server"],
+      "args": ["-y", "jellyfish-mcp-server@latest"],
       "env": {
         "JELLYFISH_API_TOKEN": "your_jellyfish_token",
         "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
@@ -194,5 +194,6 @@ Run `claude mcp list` to verify.
 - Verify your `JELLYFISH_API_TOKEN` is correct and has the necessary permissions.
 - Ensure your Jellyfish instance is reachable from your machine.
 - For npx, confirm Node.js v18 or later is installed: `node --version`.
+- For npx, make sure you're on the latest release by using the `@latest` tag: `npx -y jellyfish-mcp-server@latest`.
 - For Docker, confirm Docker is running: `docker info`.
 - If PromptGuard is unexpectedly blocking responses, set `MODEL_AVAILABILITY=true` to allow data through when PromptGuard can't be reached, or unset `HUGGINGFACE_API_TOKEN` to disable PromptGuard entirely.
