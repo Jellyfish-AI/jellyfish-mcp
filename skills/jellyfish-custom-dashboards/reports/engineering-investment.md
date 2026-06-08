@@ -2,8 +2,6 @@
 
 A visual snapshot of an organization's major deliverables — FTE investment, progress, status, and projected completion dates. Gives engineering leaders a quick view of where investment is going.
 
-The dashboard is rendered by `generate_dashboard.py`, which safely escapes all Jellyfish data through Jinja2. **Do not hand-write HTML** — your job is to fetch the data and run the generator.
-
 ---
 
 ## 1. Ask the user which work category to use
@@ -14,9 +12,9 @@ Every organization tracks top-level deliverables under different Jellyfish work 
 mcp__jellyfish-mcp__work_categories()
 ```
 
-Present the options by `display_name` and wait for the user to choose. Highlight likely candidates (Initiative, Theme, Project, Roadmap Project, etc.) but show the full list. Remember the chosen `display_name` (e.g. "Initiative") and `slug`.
+Present the options by `display_name` and wait for the user to choose. Highlight likely candidates (Initiative, Theme, Project, Roadmap Project, etc.) but show the full list.
 
-## 2. Fetch deliverable data and save it to a file
+## 2. Fetch deliverable data
 
 ```
 mcp__jellyfish-mcp__work_category_contents(
@@ -25,61 +23,61 @@ mcp__jellyfish-mcp__work_category_contents(
 )
 ```
 
-Write the **raw, unmodified** JSON response to a file, e.g. `contents.json`. Do not summarize, filter, or reshape it — the generator does that. Passing the raw payload through means there is no opportunity to introduce unescaped data by hand.
+## 3. Filter and compute
 
-## 3. Generate the dashboard
+**Filter to active deliverables only.** Include where `source_issue_status` is: "In Progress", "Selected for Development", "Backlog", "In Review". Exclude "Done", "Won't Do", or other completed/cancelled statuses. Exclude `archived` or `deleted` items.
 
-Run the generator, pointing it at the saved JSON. Pass the chosen work category `display_name` as `--subtitle`.
-
-```
-python generate_dashboard.py \
-  --data contents.json \
-  --subtitle "Initiative" \
-  --output dashboard.html
-```
-
-Options:
-- `--subtitle` (required) — the work category display name, shown under the title and pluralized in the summary bar ("Active Initiatives").
-- `--title` — defaults to "Engineering Investment Dashboard".
-- `--date` — defaults to today, formatted "Mon DD, YYYY".
-- `--output` — defaults to `dashboard.html`.
-- `--data -` — read JSON from stdin instead of a file.
-
-If `jinja2` is not installed, install the skill dependencies first: `pip install -r requirements.txt`.
-
-## 4. Present
-
-Keep the chat reply short — name what you built and the one or two findings that matter most (e.g. the biggest investment, anything idle or off-track). The dashboard has the rest.
-
----
-
-## What the generator does (for reference)
-
-You don't compute any of this — the script does. Documented here so the output is auditable.
-
-**Filter to active deliverables.** Keeps items whose `source_issue_status` is "In Progress", "Selected for Development", "Backlog", or "In Review". Excludes `archived` and `deleted` items.
-
-**Per deliverable:**
+**Per deliverable, extract:**
 
 | Dashboard field | Source | Notes |
 |---|---|---|
-| Name | `name` | Linked to `source_issue_url` |
-| URL | `source_issue_url` | Only used if it is an http/https URL (others dropped) |
-| Status | `source_issue_status` | An "In Progress" item with `is_work_ongoing: false` is shown as "Idle" |
-| Lifetime FTE | `cumulative_allocation_person_months` | 1 decimal, "mo" suffix |
-| Remaining FTE | `projected_remaining_effort` | 1 decimal, "mo" suffix, "N/A" if null |
-| Progress % | computed | `lifetime / (lifetime + remaining) * 100`; 100% if remaining is null and lifetime > 0; 0% if both 0 |
-| Projected date | `projected_date` | "Mon DD, YYYY", "Not set" if null |
-| Team count | `teams` | Count of comma-separated names |
+| Name | `name` | |
+| URL | `source_issue_url` | Link the name to this |
+| Status | `source_issue_status` | |
+| Lifetime FTE | `cumulative_allocation_person_months` | Round to 1 decimal, display with "mo" unit suffix |
+| Remaining FTE | `projected_remaining_effort` | Round to 1 decimal, display with "mo" unit suffix, "N/A" if null |
+| Progress % | computed | `lifetime / (lifetime + remaining) * 100`. If remaining is null and lifetime > 0, use 100%. If both 0, use 0% |
+| Projected date | `projected_date` | Format as "Mon DD, YYYY", "Not set" if null |
+| Team count | `teams` | Split by comma, count |
 
-**Summary bar:** Active <category>s (count), Lifetime FTE (sum, person-months invested), Remaining FTE (sum, person-months projected).
+**Summary totals:**
+- Total Deliverables = count of filtered items
+- Total Lifetime FTE = sum of `cumulative_allocation_person_months`
+- Remaining FTE = sum of `projected_remaining_effort` (null → 0)
 
-**Status badge classes:** In Progress → `badge-green`, Selected for Development → `badge-blue`, Backlog → `badge-amber`, In Review → `badge-violet`, Idle → `badge-amber`.
+**Sort** cards by Lifetime FTE descending (biggest investments first).
 
-**Sort:** cards by Lifetime FTE descending.
+## 4. Render the HTML
+
+Read `dashboard-template.html` for the page shell and component CSS classes.
+
+Copy the full template. Fill in the shell placeholders:
+- `{{TITLE}}` → "Engineering Investment Dashboard"
+- `{{SUBTITLE}}` → the chosen work category's display_name
+- `{{DATE}}` → today's date
+
+**Summary bar:** 3 items — Total Deliverables, Total Lifetime FTE (person-months), Remaining FTE (person-months).
+
+**Content area:** Use `.cards-grid` with one `.card` per deliverable. Each card contains:
+- `.card-header` with deliverable name (linked to `source_issue_url`) and status `.badge`
+- `.metrics-row` with Lifetime FTE and Remaining FTE
+- `.progress-section` with progress bar
+- `.card-footer` with projected date and team count
+
+**Status badge classes:**
+
+| Status | Class |
+|---|---|
+| In Progress | `badge-green` |
+| Selected for Development | `badge-blue` |
+| Backlog | `badge-amber` |
+| In Review | `badge-violet` |
+| Idle | `badge-amber` |
+
+Write the final HTML directly — do not generate scripts. The output should be a complete, self-contained HTML file.
 
 ---
 
 ## Markdown fallback
 
-Only when the user explicitly asks for markdown instead of a dashboard. Use a table layout with columns: Deliverable, Status, Lifetime FTE, Remaining FTE, Progress, Projected Date, Teams. Include summary totals above the table.
+Only when the user explicitly asks. Use a table layout with columns: Deliverable, Status, Lifetime FTE, Remaining FTE, Progress, Projected Date, Teams. Include summary totals above the table.
