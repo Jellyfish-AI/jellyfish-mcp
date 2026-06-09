@@ -16,7 +16,7 @@ A Model Context Protocol server for retrieving and analyzing data from Jellyfish
 
 Once you have the Jellyfish MCP connected, you can ask questions about your Jellyfish data, such as:
 
-- "What were our company metrics in December 2025?"
+- "What were our company metrics in May 2026?"
 - "Can you get a list of my organization's teams?"
 - "What are the unlinked pull requests for the last month?"
 
@@ -25,7 +25,7 @@ Once you have the Jellyfish MCP connected, you can ask questions about your Jell
 See **[INSTALL.md](INSTALL.md)** for the full setup guide. Quick links:
 
 - **Claude Desktop** — [download the `.mcpb` extension](https://github.com/Jellyfish-AI/jellyfish-mcp/releases/latest/download/jellyfish-mcp.mcpb), then double-click to install
-- **Claude Code, Cursor, VSCode** — `npx jellyfish-mcp-server` (recommended) or Docker
+- **Claude Code, Cursor, VSCode** — `npx jellyfish-mcp-server@latest` (recommended) or Docker
 
 ## Develop
 
@@ -90,6 +90,11 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 - `list_teams`
 - `search_teams`
+
+### Help Center
+
+- `search_articles`
+- `get_article`
 
 ## Skills
 

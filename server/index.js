@@ -661,6 +661,32 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     },
                     required: []
                 }
+            },
+            // HELP CENTER
+            {
+                name: "search_articles",
+                description: "Search Jellyfish help center articles using full-text search. Handles natural language queries. Note: the help center covers a limited set of topics and may not have articles for every question.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        query: {
+                            type: "string",
+                            description: "Search query - can be natural language (e.g., 'How do I set up GitHub Copilot?')."
+                        }
+                    },
+                    required: ["query"]
+                }
+            },
+            {
+                name: "get_article",
+                description: "Retrieve full content of a specific Jellyfish help center article by ID.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        article_id: { type: "integer", description: "Help center article ID" }
+                    },
+                    required: ["article_id"]
+                }
             }
         ]
     };
@@ -746,7 +772,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             return process_tool_response(await api.api_list_teams(params));
         case "search_teams":
             return process_tool_response(await api.api_search_teams(params));
-        
+
+        // HELP CENTER
+        case "search_articles":
+            return process_tool_response(await api.api_search_articles(params));
+        case "get_article":
+            return process_tool_response(await api.api_get_article(params));
+
         default:
             throw new Error(`Unknown tool: ${request.params.name}`);
     }
