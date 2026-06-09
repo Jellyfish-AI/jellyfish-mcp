@@ -1,7 +1,7 @@
 # Threat Model
 Model Context Protocol is still in its infancy, especially with regards to security. There are inherent risks in its design just as there are in `jellyfish-mcp`. We want to be super clear on what security guarantees you can expect from this and what you can not.
 
-Given the inherent risks, we do not recommend this for daily use unless you enable PromptGuard (see `README.md`).
+Given the inherent risks, we do not recommend this for daily use unless you enable PromptGuard (see [`README.md`](README.md)).
 
 ## Trust Assumptions
 We assume that all of the following are trusted when using `jellyfish-mcp`:
@@ -23,6 +23,14 @@ Of all the trust assumptions made above, the one least likely to be true in prac
 These inputs can be used to perform indirect prompt injection attacks (see: [1](https://genai.owasp.org/llmrisk/llm01-prompt-injection/)) due to how large language models work: any response returned by an MCP tool will be, in some sense, treated as textual context which could be inadverently interpreted as an instruction by the LLM.
 
 Thankfully, `jellyfish-mcp` supports Llama PromptGuard 2 (see: [2](https://meta-llama.github.io/PurpleLlama/LlamaFirewall/docs/documentation/scanners/prompt-guard-2)) which can detect responses from the Jellyfish API that might include prompt injection attacks. We *highly* recommend configuring this before using daily. Keep in mind that this is a statistical mitigation and can't catch 100% of injection attacks. If you find such novel attacks, please report them to Meta's Llama team per https://meta-llama.github.io/PurpleLlama/LlamaFirewall/docs/documentation/scanners/prompt-guard-2.
+
+## On Skills and Generated HTML
+
+Agent Skills that pair with the `jellyfish-mcp` (see [`README.md`](README.md)) may ask the LLM to author HTML directly so that they can produce rich, branded output. The model builds this HTML from data returned by the Jellyfish API.
+
+Because the HTML is generated rather than fixed, it is only as safe as the data and the model behind it. Using such a skill therefore means trusting that the data Jellyfish returns and the HTML the model builds from it are both safe to render. If that trust is misplaced, a skill could produce dangerous output, including HTML or JavaScript that the user did not intend.
+
+Skills are entirely optional and are installed separately from the MCP server, so anyone who would rather not take on this additional assumption can simply leave them uninstalled.
 
 # Security Policy
 

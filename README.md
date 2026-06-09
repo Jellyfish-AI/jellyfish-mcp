@@ -95,6 +95,8 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 In addition to the MCP tools above, the Jellyfish MCP pairs with optional Agent Skills. Skills can similarly be invoked throughout the chat conversation, but are not bundled with the MCP and need to be independently installed. To install, go to the [`skills/`](skills/) directory and add each Skill individually to your host application.
 
+> **Security note:** Skills may ask the LLM to author HTML directly, building it from data returned by the Jellyfish API. Because the HTML is generated rather than fixed, using a skill means trusting that the data Jellyfish returns and the HTML the model builds from it are both safe to render. If that trust is misplaced, a skill could produce dangerous output, including HTML or JavaScript that the user did not intend. Skills are entirely optional and are installed separately, so anyone who would rather not take on this assumption can simply leave them uninstalled. See [`SECURITY.md`](SECURITY.md) for the full discussion.
+
 ### Dashboards
 
 - `jellyfish-custom-dashboards` — Generate branded HTML dashboards from Jellyfish engineering analytics. Currently supports engineering investment reports.
