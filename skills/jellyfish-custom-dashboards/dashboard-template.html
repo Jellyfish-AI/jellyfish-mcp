@@ -1,0 +1,380 @@
+<!--
+  ANTI-PATTERNS — do not use:
+  - No white/light backgrounds
+  - No Bootstrap blue — use violet
+  - No Arial/Roboto for display headings — use Sora/Space Grotesk
+  - No rainbow gradients — violet→lime only
+  - No drop shadows — use borders
+  - No emoji — use inline SVG icons instead
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}}</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 275 330' fill='%237C3AED'><path d='M211.489 19.913C138.248 -21.6389 46.6404 3.87055 4.65734 77.5074C-4.91775 94.296 0.790481 115.748 17.3167 125.448C17.3167 125.448 26.4315 132.257 40.2417 142.097L14.5086 187.286C9.53696 196.007 12.4831 207.153 21.0915 212.189L24.1298 213.962C32.7381 218.998 43.7403 216.014 48.712 207.293L72.9719 164.762C81.3962 170.404 90.1426 176.141 98.8431 181.644L33.7509 295.853C28.7792 304.574 31.7254 315.719 40.3338 320.756L43.372 322.528C51.9804 327.565 62.9825 324.58 67.9542 315.859L133.046 201.65C142.069 206.547 151.368 211.397 160.391 215.967L117.349 291.516C112.377 300.237 115.323 311.382 123.932 316.419L126.97 318.191C135.578 323.228 146.58 320.243 151.552 311.522L196.113 233.315C211.442 240.497 221.8 245.067 221.8 245.067C238.372 254.767 259.548 248.985 269.123 232.243L270.274 230.237C312.81 155.621 285.88 62.1178 211.489 19.913Z'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script> <!-- pragma: allowlist secret -->
+<style>
+
+  /* ========================================
+     BRAND TOKENS
+     ======================================== */
+  :root {
+    /* Surfaces */
+    --jf-bg: #0E0B2E;
+    --jf-surface: #1A1740;
+    --jf-surface-2: #252148;
+    --jf-border: #2E2A55;
+
+    /* Accents */
+    --jf-lime: #D4FF3D;
+    --jf-lime-dim: #A8CC2F;
+    --jf-violet: #7C3AED;
+    --jf-violet-dim: #5B21B6;
+
+    /* Text */
+    --jf-text: #FFFFFF;
+    --jf-text-muted: #9B98C7;
+    --jf-text-dim: #6B6890;
+
+    /* Status */
+    --jf-green: #3DD68C;
+    --jf-amber: #FFB547;
+    --jf-red: #FF5C7A;
+    --jf-blue: #4FC3F7;
+
+    /* Data viz palette */
+    --jf-series-1: #D4FF3D;
+    --jf-series-2: #7C3AED;
+    --jf-series-3: #4FC3F7;
+    --jf-series-4: #FFB547;
+    --jf-series-5: #3DD68C;
+    --jf-series-6: #FF5C7A;
+
+    /* Chart */
+    --jf-grid: rgba(255,255,255,0.06);
+    --jf-axis: rgba(255,255,255,0.35);
+    --jf-fill-opacity: 0.18;
+
+    /* Fonts */
+    --jf-font-display: 'Sora', 'Space Grotesk', system-ui, sans-serif;
+    --jf-font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --jf-font-mono: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace;
+  }
+
+  /* ========================================
+     BASE
+     ======================================== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--jf-font-body);
+    background: var(--jf-bg);
+    color: var(--jf-text);
+    padding: 48px 24px;
+  }
+
+  .container { max-width: 1400px; margin: 0 auto; }
+
+  /* ========================================
+     PAGE SHELL: Header, Summary Bar, Footer
+     ======================================== */
+
+  .dashboard-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px;
+  }
+  .dashboard-header h1 {
+    font-family: var(--jf-font-display);
+    font-size: 32px; font-weight: 700; color: var(--jf-text);
+  }
+  .dashboard-header .subtitle {
+    font-size: 14px; color: var(--jf-text-muted); margin-top: 4px;
+  }
+  .dashboard-header .date-badge {
+    font-size: 13px; color: var(--jf-text-muted);
+    border: 1px solid var(--jf-border); border-radius: 8px;
+    padding: 6px 12px; background: var(--jf-surface);
+  }
+
+  .summary-bar {
+    background: linear-gradient(135deg, var(--jf-violet) 0%, var(--jf-violet-dim) 100%);
+    border-radius: 16px; padding: 24px 32px;
+    display: flex; gap: 48px; margin-bottom: 24px; flex-wrap: wrap;
+  }
+  .summary-item .label {
+    font-size: 13px; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.08em; color: rgba(255,255,255,0.6); margin-bottom: 4px;
+  }
+  .summary-item .value {
+    font-family: var(--jf-font-mono);
+    font-size: 40px; font-weight: 700; color: var(--jf-lime);
+  }
+  .summary-item .desc { font-size: 14px; color: rgba(255,255,255,0.5); }
+
+  .jf-footer {
+    display: flex; gap: 8px; justify-content: center;
+    margin-top: 48px; padding: 16px 0;
+    font-size: 11px; color: var(--jf-text-dim);
+  }
+
+  /* ========================================
+     COMPONENT: Card
+     ======================================== */
+
+  .cards-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+  }
+  .cards-grid--3col { grid-template-columns: repeat(3, 1fr); }
+  .cards-stack { display: flex; flex-direction: column; gap: 24px; }
+
+  @media (max-width: 1199px) { .cards-grid, .cards-grid--3col { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 767px) { .cards-grid, .cards-grid--3col { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--jf-surface);
+    border: 1px solid var(--jf-border);
+    border-radius: 16px; padding: 24px;
+    display: flex; flex-direction: column; gap: 16px;
+    position: relative; overflow: hidden;
+  }
+
+  .card-header {
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  }
+  .card-header h3 {
+    font-family: var(--jf-font-display);
+    font-size: 16px; font-weight: 600; line-height: 1.3; flex: 1; color: var(--jf-text);
+  }
+  .card-header h3 a { color: var(--jf-text); text-decoration: none; }
+  .card-header h3 a:hover { color: var(--jf-lime); text-decoration: underline; }
+
+  .card-footer {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    font-size: 13px; color: var(--jf-text-dim);
+    border-top: 1px solid var(--jf-border); padding-top: 12px;
+  }
+  .card-footer span { display: flex; align-items: center; gap: 6px; }
+  .card-footer svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ========================================
+     COMPONENT: Number Card
+     ======================================== */
+
+  .jf-number-card {
+    background: var(--jf-surface);
+    border: 1px solid var(--jf-border);
+    border-radius: 16px; padding: 20px 22px;
+    position: relative; overflow: hidden;
+  }
+  .jf-number-card__label {
+    font: 500 13px/1 var(--jf-font-body);
+    color: var(--jf-text-muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .jf-number-card__value {
+    font: 700 40px/1.1 var(--jf-font-mono);
+    color: var(--jf-text); margin-top: 12px;
+  }
+  .jf-number-card__delta { font: 500 12px/1 var(--jf-font-body); margin-top: 8px; }
+  .jf-number-card__delta--up   { color: var(--jf-green); }
+  .jf-number-card__delta--down { color: var(--jf-red); }
+  .jf-number-card__delta--flat { color: var(--jf-text-dim); }
+
+  .jf-number-card--hero {
+    background: linear-gradient(135deg, var(--jf-violet) 0%, #4F1BB8 60%, var(--jf-violet-dim) 100%);
+    border-color: transparent;
+  }
+  .jf-number-card--hero .jf-number-card__value { color: var(--jf-lime); }
+
+  /* ========================================
+     COMPONENT: Status Badge / Pill
+     ======================================== */
+
+  .badge {
+    font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 999px;
+    white-space: nowrap; flex-shrink: 0; text-transform: uppercase; letter-spacing: 0.06em;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .badge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; }
+  .badge-green { background: rgba(61,214,140,0.12); color: var(--jf-green); }
+  .badge-green::before { background: var(--jf-green); }
+  .badge-blue { background: rgba(79,195,247,0.12); color: var(--jf-blue); }
+  .badge-blue::before { background: var(--jf-blue); }
+  .badge-amber { background: rgba(255,181,71,0.12); color: var(--jf-amber); }
+  .badge-amber::before { background: var(--jf-amber); }
+  .badge-violet { background: rgba(124,58,237,0.12); color: var(--jf-violet); }
+  .badge-violet::before { background: var(--jf-violet); }
+  .badge-red { background: rgba(255,92,122,0.12); color: var(--jf-red); }
+  .badge-red::before { background: var(--jf-red); }
+
+  /* ========================================
+     COMPONENT: Tags
+     ======================================== */
+
+  .jf-chip {
+    font: 600 10px var(--jf-font-body);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px;
+    border: 1px solid var(--jf-lime);
+    color: var(--jf-lime);
+    background: rgba(212,255,61,0.06);
+    white-space: nowrap;
+  }
+  .jf-chip--violet { border-color: var(--jf-violet); color: var(--jf-violet); background: rgba(124,58,237,0.10); }
+  .jf-chip--muted { border-color: var(--jf-text-muted); color: var(--jf-text-muted); background: rgba(155,152,199,0.10); }
+
+  /* ========================================
+     COMPONENT: Metrics Row
+     ======================================== */
+
+  .metrics-row { display: flex; gap: 24px; flex-wrap: wrap; }
+  .metric .metric-label {
+    font-size: 13px; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--jf-text-muted); margin-bottom: 2px;
+  }
+  .metric .metric-value {
+    font-family: var(--jf-font-mono);
+    font-size: 24px; font-weight: 700; color: var(--jf-text);
+  }
+  .metric .metric-unit { font-size: 14px; font-weight: 400; color: var(--jf-text-dim); }
+
+  /* ========================================
+     COMPONENT: Progress Bar
+     ======================================== */
+
+  .progress-section { width: 100%; }
+  .progress-header {
+    display: flex; justify-content: space-between;
+    font-size: 13px; color: var(--jf-text-muted); margin-bottom: 6px;
+  }
+  .progress-bar {
+    height: 8px; background: var(--jf-border); border-radius: 4px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--jf-violet), var(--jf-lime));
+    border-radius: 4px;
+  }
+
+  /* ========================================
+     COMPONENT: Table
+     ======================================== */
+
+  .jf-table { width: 100%; border-collapse: collapse; }
+  .jf-table th {
+    text-align: left;
+    font: 500 11px var(--jf-font-body);
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--jf-text-muted);
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--jf-border);
+  }
+  .jf-table td {
+    padding: 14px;
+    font: 400 13px var(--jf-font-body);
+    color: var(--jf-text);
+    border-bottom: 1px solid var(--jf-border);
+  }
+  .jf-table th.num { text-align: right; }
+  .jf-table td.num {
+    font-family: var(--jf-font-mono);
+    font-weight: 500; text-align: right;
+  }
+  .jf-table tr:hover td { background: var(--jf-surface-2); }
+
+  /* ========================================
+     COMPONENT: Effort Mini Bars
+     ======================================== */
+
+  .effort-bars { display: flex; align-items: flex-end; gap: 4px; height: 40px; }
+  .effort-bar { width: 24px; border-radius: 3px 3px 0 0; background: var(--jf-lime-dim); }
+  .effort-labels { display: flex; gap: 4px; margin-top: 4px; }
+  .effort-label { width: 24px; text-align: center; font-size: 10px; color: var(--jf-text-dim); }
+
+  /* ========================================
+     COMPONENT: Section Card (full-width)
+     ======================================== */
+
+  .section-card {
+    background: var(--jf-surface);
+    border: 1px solid var(--jf-border);
+    border-radius: 16px; padding: 24px 32px;
+    margin-top: 24px;
+  }
+  .section-card h2 {
+    font-family: var(--jf-font-display);
+    font-size: 20px; font-weight: 600; color: var(--jf-text); margin-bottom: 12px;
+  }
+
+  /* ========================================
+     COMPONENT: Bullet List
+     ======================================== */
+
+  .bullet-list { list-style: none; padding: 0; }
+  .bullet-list li {
+    font-size: 14px; color: var(--jf-text-muted); line-height: 1.5;
+    padding: 4px 0 4px 16px; position: relative;
+  }
+  .bullet-list li::before {
+    content: "\2022"; position: absolute; left: 0;
+    color: var(--jf-lime); font-weight: 600;
+  }
+
+  /* ========================================
+     COMPONENT: Chart Container
+     ======================================== */
+
+  .jf-chart {
+    background: var(--jf-surface);
+    border: 1px solid var(--jf-border);
+    border-radius: 16px; padding: 20px;
+  }
+  .jf-chart__head {
+    display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;
+  }
+  .jf-chart__title {
+    font: 600 16px var(--jf-font-display); color: var(--jf-text);
+  }
+  .jf-chart__sub {
+    font: 500 12px var(--jf-font-body); color: var(--jf-text-muted);
+  }
+  .jf-chart__body { height: 240px; }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="dashboard-header">
+    <div>
+      <h1>{{TITLE}}</h1>
+      <div class="subtitle">{{SUBTITLE}}</div>
+    </div>
+    <div class="date-badge">As of {{DATE}}</div>
+  </div>
+
+  <!-- SUMMARY BAR — use as many summary-items as the report needs -->
+  <div class="summary-bar">
+    <!-- {{SUMMARY_ITEMS}} -->
+  </div>
+
+  <!-- CONTENT AREA — each report builds this section using the components above -->
+  <main>
+    <!-- {{CONTENT}} -->
+  </main>
+
+  <footer class="jf-footer">
+    <span>Generated with Jellyfish</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
