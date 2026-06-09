@@ -14,6 +14,7 @@ import {
 import * as api from "./api.js";
 import { encode } from '@toon-format/toon';
 import { sanitize_api_response } from './sanitizer.js';
+import { setTransport, setTools, attachInitializeCapture } from './mcp_context.js';
 
 // Get version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -34,6 +35,9 @@ const server = new Server(
         }
     }
 );
+
+setTransport('stdio');
+attachInitializeCapture(server);
 
 // Helper function to filter out undefined/null/empty array values from parameters
 function filter_params(params) {
@@ -694,6 +698,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 
 // Handler to execute tool calls
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    setTools(request.params.name);
     const params = filter_params(request.params.arguments || {});
 
     switch (request.params.name) {
