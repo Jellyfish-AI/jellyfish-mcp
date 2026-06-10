@@ -53,7 +53,7 @@ describe('API Module', async () => {
 
     // Re-import to pick up mocked fetch
     const api = await import('../server/api.js?' + Date.now());
-    await api.api_list_teams({ hierarchy_level: 1 });
+    await api.api_generic('/endpoints/export/v0/teams/list_teams', { hierarchy_level: 1 });
 
     assert.ok(capturedHeaders.Authorization, 'Authorization header should exist');
     assert.ok(capturedHeaders.Authorization.includes('Token'), 'Should use Token auth scheme');
@@ -77,7 +77,7 @@ describe('API Module', async () => {
     });
 
     const api = await import('../server/api.js?' + Date.now());
-    await api.api_company_metrics({});
+    await api.api_generic('/endpoints/export/v0/metrics/company_metrics', {});
 
     assert.ok(capturedHeaders['User-Agent'], 'User-Agent header should exist');
     assert.ok(capturedHeaders['User-Agent'].includes('jellyfish-mcp'), 'User-Agent should identify this MCP');
@@ -99,7 +99,7 @@ describe('API Module', async () => {
     }));
 
     const api = await import('../server/api.js?' + Date.now());
-    const result = await api.api_list_teams({ hierarchy_level: 1 });
+    const result = await api.api_generic('/endpoints/export/v0/teams/list_teams', { hierarchy_level: 1 });
 
     assert.deepStrictEqual(result, mockData);
   });
@@ -118,7 +118,7 @@ describe('API Module', async () => {
     }));
 
     const api = await import('../server/api.js?' + Date.now());
-    const result = await api.api_company_metrics({});
+    const result = await api.api_generic('/endpoints/export/v0/metrics/company_metrics', {});
 
     assert.ok(result.error, 'Should have error property');
     assert.ok(result.error.includes('401'), 'Error should include status code');
@@ -136,7 +136,7 @@ describe('API Module', async () => {
     });
 
     const api = await import('../server/api.js?' + Date.now());
-    const result = await api.api_company_metrics({});
+    const result = await api.api_generic('/endpoints/export/v0/metrics/company_metrics', {});
 
     assert.ok(result.error, 'Should have error property');
     assert.ok(result.message, 'Should have message property');
@@ -160,7 +160,7 @@ describe('API Module', async () => {
     });
 
     const api = await import('../server/api.js?' + Date.now());
-    await api.api_team_metrics({
+    await api.api_generic('/endpoints/export/v0/metrics/team_metrics', {
       team_id: [1, 2],
       start_date: '2025-01-01',
       end_date: '2025-01-31'
