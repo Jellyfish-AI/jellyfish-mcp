@@ -16,8 +16,7 @@ if (!API_TOKEN) {
     throw new Error("No Jellyfish API token found");
 }
 
-// Get schema URL from API base URL
-const API_BASE_URL = "https://app.jellyfish.co";
+const API_BASE_URL = process.env.JELLYFISH_API_BASE_URL || "https://app.jellyfish.co";
 const SCHEMA_URL = `${API_BASE_URL}/endpoints/export/v0/schema`;
 let apiSchema = null; // Store API schema globally
 
@@ -224,8 +223,13 @@ export async function api_allocations_summary_by_work_category(params = {}) {
 }
 
 // --- DELIVERY ---
-export async function api_deliverable_details(params = {}) {
-    const endpoint = "/endpoints/export/v0/delivery/deliverable_details";
+export async function api_get_deliverable({ deliverable_id, ...query_params } = {}) {
+    const endpoint = `/endpoints/export/v0/mcp/get_deliverable/${deliverable_id}`;
+    return await api_generic(endpoint, query_params);
+}
+
+export async function api_search_deliverables(params = {}) {
+    const endpoint = "/endpoints/export/v0/mcp/search_deliverables";
     return await api_generic(endpoint, params);
 }
 
@@ -296,16 +300,4 @@ export async function api_list_teams(params = {}) {
 export async function api_search_teams(params = {}) {
     const endpoint = "/endpoints/export/v0/teams/search";
     return await api_generic(endpoint, params);
-}
-
-// --- HELP CENTER ---
-export async function api_search_articles(params = {}) {
-    const endpoint = "/endpoints/export/v0/mcp/help_center/search";
-    return await api_generic(endpoint, params);
-}
-
-export async function api_get_article(params = {}) {
-    const { article_id, ...rest } = params;
-    const endpoint = `/endpoints/export/v0/mcp/help_center/article/${article_id}`;
-    return await api_generic(endpoint, rest);
 }
