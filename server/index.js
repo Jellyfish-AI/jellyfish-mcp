@@ -12,9 +12,10 @@ import {
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import * as api from "./api.js";
-import { ApiToolRegistry } from "./tools.js";
+import { ApiToolRegistry, get_current_date_local } from "./tools.js";
 import { encode } from '@toon-format/toon';
 import { sanitize_api_response } from './sanitizer.js';
+import { SERVER_INSTRUCTIONS } from './instructions.js';
 
 // Get version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +33,8 @@ const server = new Server(
         capabilities: {
             tools: {},      // Enable tools capability
             resources: {}   // Enable resources capability
-        }
+        },
+        instructions: SERVER_INSTRUCTIONS
     }
 );
 
@@ -156,8 +158,19 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
         tools: [
             ...ApiToolRegistry.listDefinitions(),
-            // TODO: migrate remaining categories below (allocations, delivery, devex, metrics, people, teams) 
+            // TODO: migrate remaining categories below (allocations, delivery, devex, metrics, people, teams)
             // to dynamic dispatch using ApiTool class
+            {
+                name: "get_current_date",
+                description: "Returns today's date in the specified timezone (default UTC). Call this BEFORE computing any relative date like \"yesterday\", \"last week\", \"this quarter\", \"last Monday\". Today's date is not in your context — guessing it from training data leads to wrong-year errors that downstream tools (e.g. search_deliverables) will reject. After calling, use the returned `date` to compute ISO bounds for timeframe_start / timeframe_end. The `day_of_week` field helps with weekday-relative queries.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        timezone: { type: "string", description: "IANA timezone name, e.g. \"America/New_York\", \"Europe/London\", \"UTC\". Defaults to UTC if omitted." }
+                    },
+                    required: []
+                }
+            },
             // ALLOCATIONS
             {
                 name: "allocations_by_person",
@@ -368,18 +381,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             // DELIVERY
             {
-                name: "deliverable_details",
-                description: "Returns data about a specific deliverable.",
-                inputSchema: {
-                    type: "object",
-                    properties: {
-                        format: { type: "string", default: "json", description: "Response format" },
-                        deliverable_id: { type: "integer", description: "Jellyfish deliverable id" }
-                    },
-                    required: ["deliverable_id"]
-                }
-            },
-            {
                 name: "deliverable_scope_and_effort_history",
                 description: "Returns weekly data about the scope of a deliverable and the total effort allocated per week.",
                 inputSchema: {
@@ -401,26 +402,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     type: "object",
                     properties: {},
                     required: []
-                }
-            },
-            {
-                name: "work_category_contents",
-                description: "Returns data about the deliverables in a specified work category.",
-                inputSchema: {
-                    type: "object",
-                    properties: {
-                        format: { type: "string", default: "json", description: "Response format" },
-                        start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
-                        end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                        unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
-                        series: { type: "boolean", description: "Whether to return series data" },
-                        work_category_slug: { type: "string", description: "Work category slug" },
-                        completed_only: { type: "boolean", description: "Only completed deliverables" },
-                        inprogress_only: { type: "boolean", description: "Only in-progress deliverables" },
-                        view_archived: { type: "boolean", description: "Include archived deliverables" },
-                        team_id: { type: "array", items: {type: "integer"}, description: "List of team IDs" }
-                    },
-                    required: ["work_category_slug"]
                 }
             },
             // DEVEX
@@ -576,7 +557,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     },
                     required: []
                 }
-            },
+            }
         ]
     };
 });
@@ -592,6 +573,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     // TODO: Migrate remaining tools to dynamic dispatch using ApiTool class
     switch (request.params.name) {
+        case "get_current_date":
+            return process_tool_response(get_current_date_local(params.timezone));
+
         // ALLOCATIONS
         case "allocations_by_person":
             return process_tool_response(await api.api_allocations_by_person(params));
@@ -617,15 +601,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             return process_tool_response(await api.api_allocations_summary_by_work_category(params));
 
         // DELIVERY
-        case "deliverable_details":
-            return process_tool_response(await api.api_deliverable_details(params));
         case "deliverable_scope_and_effort_history":
             return process_tool_response(await api.api_deliverable_scope_and_effort_history(params));
         case "work_categories":
             return process_tool_response(await api.api_work_categories({ format: "json" }));
         case "work_category_contents":
             return process_tool_response(await api.api_work_category_contents(params));
-
+        
         // DEVEX
         case "devex_insights_by_team":
             return process_tool_response(await api.api_devex_insights_by_team(params));
@@ -653,6 +635,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             return process_tool_response(await api.api_list_teams(params));
         case "search_teams":
             return process_tool_response(await api.api_search_teams(params));
+
 
         default:
             throw new Error(`Unknown tool: ${request.params.name}`);

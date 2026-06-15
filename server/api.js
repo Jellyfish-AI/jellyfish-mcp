@@ -16,8 +16,7 @@ if (!API_TOKEN) {
     throw new Error("No Jellyfish API token found");
 }
 
-// Get schema URL from API base URL
-const API_BASE_URL = "https://app.jellyfish.co";
+const API_BASE_URL = process.env.JELLYFISH_API_BASE_URL || "https://app.jellyfish.co";
 const SCHEMA_URL = `${API_BASE_URL}/endpoints/export/v0/schema`;
 let apiSchema = null; // Store API schema globally
 
@@ -136,8 +135,6 @@ export async function api_generic(endpoint, params = {}) {
     }
 }
 
-// TODO: migrate remaining categories (allocations, delivery, devex, metrics, people, teams) to tools.js
-
 // --- ALLOCATIONS ---
 export async function api_allocations_by_person(params = {}) {
     const endpoint = "/endpoints/export/v0/allocations/details/by_person";
@@ -195,11 +192,6 @@ export async function api_allocations_summary_by_work_category(params = {}) {
 }
 
 // --- DELIVERY ---
-export async function api_deliverable_details(params = {}) {
-    const endpoint = "/endpoints/export/v0/delivery/deliverable_details";
-    return await api_generic(endpoint, params);
-}
-
 export async function api_deliverable_scope_and_effort_history(params = {}) {
     const endpoint = "/endpoints/export/v0/delivery/scope_and_effort_history";
     return await api_generic(endpoint, params);
@@ -268,5 +260,3 @@ export async function api_search_teams(params = {}) {
     const endpoint = "/endpoints/export/v0/teams/search";
     return await api_generic(endpoint, params);
 }
-
-
