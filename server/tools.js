@@ -46,7 +46,7 @@ class ApiTool {
 // Exists because models don't have reliable access to "now" and produce
 // wrong-year dates otherwise; downstream tools (e.g. search_deliverables)
 // then reject those dates via their timeframe clamps.
-function get_current_date_local(timezone) {
+export function get_current_date_local(timezone) {
     const tz = timezone || "UTC";
     let parts;
     try {
@@ -205,21 +205,6 @@ const apiTools = [
         // override call to handle dynamic endpoint with article_id
         call({ article_id, ...rest }) {
             return api_generic(`/endpoints/export/v0/mcp/help_center/article/${article_id}`, rest);
-        }
-    }),
-
-    new ApiTool({
-        name: "get_current_date",
-        description: "Returns today's date in the specified timezone (default UTC). Call this BEFORE computing any relative date like \"yesterday\", \"last week\", \"this quarter\", \"last Monday\". Today's date is not in your context — guessing it from training data leads to wrong-year errors that downstream tools (e.g. search_deliverables) will reject. After calling, use the returned `date` to compute ISO bounds for timeframe_start / timeframe_end. The `day_of_week` field helps with weekday-relative queries.",
-        inputSchema: {
-            type: "object",
-            properties: {
-                timezone: { type: "string", description: "IANA timezone name, e.g. \"America/New_York\", \"Europe/London\", \"UTC\". Defaults to UTC if omitted." }
-            },
-            required: []
-        },
-        call({ timezone } = {}) {
-            return get_current_date_local(timezone);
         }
     }),
 
