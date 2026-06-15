@@ -11,9 +11,10 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
-import { ApiToolRegistry } from "./tools.js";
+import { ApiToolRegistry, get_current_date_local } from "./tools.js";
 import { encode } from '@toon-format/toon';
 import { sanitize_api_response } from './sanitizer.js';
+import { SERVER_INSTRUCTIONS } from './instructions.js';
 
 // Get version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -31,7 +32,8 @@ const server = new Server(
         capabilities: {
             tools: {},      // Enable tools capability
             resources: {}   // Enable resources capability
-        }
+        },
+        instructions: SERVER_INSTRUCTIONS
     }
 );
 
@@ -153,7 +155,20 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
 // Handler to list all available tools (returns Jellyfish API tools)
 server.setRequestHandler(ListToolsRequestSchema, async () => {
     return {
-        tools: ApiToolRegistry.listDefinitions()
+        tools: [
+            ...ApiToolRegistry.listDefinitions(),
+            {
+                name: "get_current_date",
+                description: "Returns today's date in the specified timezone (default UTC). Call this BEFORE computing any relative date like \"yesterday\", \"last week\", \"this quarter\", \"last Monday\". Today's date is not in your context — guessing it from training data leads to wrong-year errors that downstream tools (e.g. search_deliverables) will reject. After calling, use the returned `date` to compute ISO bounds for timeframe_start / timeframe_end. The `day_of_week` field helps with weekday-relative queries.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        timezone: { type: "string", description: "IANA timezone name, e.g. \"America/New_York\", \"Europe/London\", \"UTC\". Defaults to UTC if omitted." }
+                    },
+                    required: []
+                }
+            }
+        ]
     };
 });
 
@@ -166,7 +181,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return process_tool_response(await tool.call(params));
     }
 
-    throw new Error(`Unknown tool: ${request.params.name}`);
+    switch (request.params.name) {
+        case "get_current_date":
+            return process_tool_response(get_current_date_local(params.timezone));
+
+        default:
+            throw new Error(`Unknown tool: ${request.params.name}`);
+    }
 });
 
 // Main function to start the MCP server with stdio transport
