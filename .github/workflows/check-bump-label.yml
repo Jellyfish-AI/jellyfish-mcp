@@ -1,0 +1,25 @@
+name: Require Bump Label
+on:
+  # Re-runs whenever labels change or new commits are pushed, so the check stays current
+  pull_request:
+    types: [opened, labeled, unlabeled, synchronize, reopened]
+
+jobs:
+  check-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for bump label
+        run: |
+          has_patch=${{ contains(github.event.pull_request.labels.*.name, 'patch') }}
+          has_minor=${{ contains(github.event.pull_request.labels.*.name, 'minor') }}
+          has_major=${{ contains(github.event.pull_request.labels.*.name, 'major') }}
+          count=$(( ($has_patch == 'true') + ($has_minor == 'true') + ($has_major == 'true') ))
+          if [ "$count" -eq 0 ]; then
+            echo "Error: PR must have exactly one of these labels: patch, minor, major"
+            exit 1
+          elif [ "$count" -gt 1 ]; then
+            # Prevent ambiguity — only one bump type allowed per PR
+            echo "Error: PR has multiple bump labels — use exactly one of: patch, minor, major"
+            exit 1
+          fi
+          echo "Bump label found"
