@@ -1,0 +1,39 @@
+name: Require Version Bump
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check versions match
+        run: |
+          pkg_version=$(python3 -c "import json; print(json.load(open('package.json'))['version'])")
+          manifest_version=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+          if [ "$pkg_version" != "$manifest_version" ]; then
+            echo "Error: package.json ($pkg_version) and manifest.json ($manifest_version) versions don't match"
+            exit 1
+          fi
+          echo "Versions match: $pkg_version"
+
+      - name: Check version is ahead of main
+        run: |
+          main_version=$(git show origin/main:package.json | python3 -c "import sys,json; print(json.load(sys.stdin)['version'])")
+          pr_version=$(python3 -c "import json; print(json.load(open('package.json'))['version'])")
+          if [ "$main_version" = "$pr_version" ]; then
+            echo "Error: version ($pr_version) is the same as main — run npm version patch/minor/major"
+            exit 1
+          fi
+          higher=$(node -e "const [a,b] = process.argv.slice(1).map(v=>v.split('.').map(Number)); const gt=(x,y)=>x[0]>y[0]||x[0]===y[0]&&(x[1]>y[1]||x[1]===y[1]&&x[2]>y[2]); console.log(gt(a,b))" "$pr_version" "$main_version")
+          if [ "$higher" != "true" ]; then
+            echo "Error: version ($pr_version) is behind main ($main_version) — run npm version patch/minor/major"
+            exit 1
+          fi
+          echo "Version bumped: $main_version -> $pr_version"
