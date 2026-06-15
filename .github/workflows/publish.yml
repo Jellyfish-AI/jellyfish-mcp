@@ -1,17 +1,23 @@
 name: Publish Package
 on:
-  push:
-    tags:
-      - 'v*'
+  # Triggered by the Bump Version workflow completing — avoids needing a PAT for cross-workflow triggers
+  workflow_run:
+    workflows: ["Bump Version on Merge"]
+    types: [completed]
 permissions:
   id-token: write
   contents: read
 jobs:
   publish:
+    # Only publish if the version bump succeeded
+    if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment: npm-publish
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Explicitly checkout main so we get the bumped version commit
+          ref: main
       - uses: actions/setup-node@v6
         with:
           node-version: '24'

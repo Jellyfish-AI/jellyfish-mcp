@@ -1,0 +1,51 @@
+name: Bump Version on Merge
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  bump:
+    # Only run when the PR was actually merged, not just closed
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    concurrency:
+      group: bump-version
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Determine bump type
+        id: bump-type
+        run: |
+          if ${{ contains(github.event.pull_request.labels.*.name, 'major') }}; then
+            echo "type=major" >> $GITHUB_OUTPUT
+          elif ${{ contains(github.event.pull_request.labels.*.name, 'minor') }}; then
+            echo "type=minor" >> $GITHUB_OUTPUT
+          elif ${{ contains(github.event.pull_request.labels.*.name, 'patch') }}; then
+            echo "type=patch" >> $GITHUB_OUTPUT
+          else
+            # This shouldn't happen in practice since check-bump-label.yml is a required status check
+            echo "type=none" >> $GITHUB_OUTPUT
+          fi
+
+      - uses: actions/setup-node@v6
+        if: steps.bump-type.outputs.type != 'none'
+        with:
+          node-version: '24'
+
+      - name: Bump version
+        if: steps.bump-type.outputs.type != 'none'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # npm version bumps package.json, commits, and creates a git tag automatically
+          npm version ${{ steps.bump-type.outputs.type }} -m "bump version to %s [skip ci]"
+          # --follow-tags pushes both the commit and the new version tag
+          git push --follow-tags
