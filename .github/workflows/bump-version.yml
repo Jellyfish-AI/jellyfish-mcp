@@ -10,6 +10,9 @@ jobs:
     # Only run when the PR was actually merged, not just closed
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    concurrency:
+      group: bump-version
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
@@ -28,7 +31,7 @@ jobs:
           elif ${{ contains(github.event.pull_request.labels.*.name, 'patch') }}; then
             echo "type=patch" >> $GITHUB_OUTPUT
           else
-            # No bump label — skip remaining steps gracefully
+            # This shouldn't happen in practice since check-bump-label.yml is a required status check
             echo "type=none" >> $GITHUB_OUTPUT
           fi
 
