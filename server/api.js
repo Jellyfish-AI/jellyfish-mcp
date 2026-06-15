@@ -135,8 +135,6 @@ export async function api_generic(endpoint, params = {}) {
     }
 }
 
-// TODO: migrate remaining categories (allocations, delivery, devex, metrics, people, teams) to tools.js
-
 // --- ALLOCATIONS ---
 export async function api_allocations_by_person(params = {}) {
     const endpoint = "/endpoints/export/v0/allocations/details/by_person";
@@ -194,16 +192,6 @@ export async function api_allocations_summary_by_work_category(params = {}) {
 }
 
 // --- DELIVERY ---
-export async function api_get_deliverable({ deliverable_id, ...query_params } = {}) {
-    const endpoint = `/endpoints/export/v0/mcp/get_deliverable/${deliverable_id}`;
-    return await api_generic(endpoint, query_params);
-}
-
-export async function api_search_deliverables(params = {}) {
-    const endpoint = "/endpoints/export/v0/mcp/search_deliverables";
-    return await api_generic(endpoint, params);
-}
-
 export async function api_deliverable_scope_and_effort_history(params = {}) {
     const endpoint = "/endpoints/export/v0/delivery/scope_and_effort_history";
     return await api_generic(endpoint, params);
