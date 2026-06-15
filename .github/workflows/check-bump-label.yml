@@ -10,10 +10,10 @@ jobs:
     steps:
       - name: Check for bump label
         run: |
-          has_patch=${{ contains(github.event.pull_request.labels.*.name, 'patch') }}
-          has_minor=${{ contains(github.event.pull_request.labels.*.name, 'minor') }}
-          has_major=${{ contains(github.event.pull_request.labels.*.name, 'major') }}
-          count=$(( ($has_patch == 'true') + ($has_minor == 'true') + ($has_major == 'true') ))
+          count=0
+          ${{ contains(github.event.pull_request.labels.*.name, 'patch') }} && count=$((count + 1)) || true
+          ${{ contains(github.event.pull_request.labels.*.name, 'minor') }} && count=$((count + 1)) || true
+          ${{ contains(github.event.pull_request.labels.*.name, 'major') }} && count=$((count + 1)) || true
           if [ "$count" -eq 0 ]; then
             echo "Error: PR must have exactly one of these labels: patch, minor, major"
             exit 1
