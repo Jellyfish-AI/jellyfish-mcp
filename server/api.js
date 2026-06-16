@@ -88,6 +88,11 @@ export async function api_list_endpoints() {
 export async function api_generic(endpoint, params = {}) {
     const url = new URL(endpoint, API_BASE_URL);
 
+    // We always parse responses as JSON (response.json() below), so force
+    // format=json on every request rather than exposing it as a tool param.
+    // Export endpoints accept it; MCP endpoints ignore it harmlessly.
+    params = { ...params, format: "json" };
+
     // Add query parameters
     Object.keys(params).forEach(key => {
         if (params[key] !== undefined && params[key] !== null) {

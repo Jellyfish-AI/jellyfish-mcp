@@ -86,7 +86,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" }
@@ -102,7 +101,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" }
@@ -118,7 +116,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -135,7 +132,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -152,7 +148,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -169,7 +164,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -187,7 +181,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -207,7 +200,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -229,7 +221,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -249,7 +240,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -269,7 +259,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -291,7 +280,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -312,7 +300,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -333,7 +320,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -367,7 +353,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\", \"sprint\")" },
@@ -391,7 +376,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\", \"sprint\")" },
@@ -417,7 +401,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 deliverable_id: { type: "integer", description: "Jellyfish deliverable id" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
@@ -501,7 +484,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -523,7 +505,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -540,7 +521,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -558,7 +538,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\", \"sprint\")" },
@@ -576,7 +555,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 team_id: { type: "integer", description: "Team ID" }
@@ -592,7 +570,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
                 unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
@@ -613,7 +590,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 effective_date: { type: "string", description: "Effective date (YYYY-MM-DD)" }
             },
             required: []
@@ -627,7 +603,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 name: { type: "array", items: { type: "string" }, description: "List of names" },
                 email: { type: "array", items: { type: "string" }, description: "List of emails" },
                 person_id: { type: "array", items: { type: "integer" }, description: "List of person IDs" }
@@ -644,7 +619,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 hierarchy_level: { type: "integer", description: "Team hierarchy level" },
                 include_children: { type: "boolean", description: "Whether to include child teams" }
             },
@@ -659,7 +633,6 @@ const apiTools = [
         inputSchema: {
             type: "object",
             properties: {
-                format: { type: "string", default: "json", description: "Response format" },
                 name: { type: "array", items: { type: "string" }, description: "List of team names" },
                 team_id: { type: "array", items: { type: "integer" }, description: "List of team IDs" }
             },
