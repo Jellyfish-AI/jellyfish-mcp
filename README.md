@@ -37,7 +37,8 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 ### General
 
-- `get_api_schema` - Retrieves the complete API schema with all available API endpoints
+- `api_schema` - Retrieves the complete API schema with all available API endpoints
+- `get_current_date` - Returns today's date in the specified timezone
 
 ### AI Impact
 
@@ -64,10 +65,10 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 ### Delivery
 
-- `deliverable_details`
 - `deliverable_scope_and_effort_history`
 - `work_categories`
-- `work_category_contents`
+- `get_deliverable`
+- `search_deliverables`
 
 ### DevEx
 
