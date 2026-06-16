@@ -170,6 +170,10 @@
     {
       "name": "get_article",
       "description": "Retrieves the full content of a help center article by ID."
+    },
+    {
+      "name": "get_current_date",
+      "description": "Returns today's date in the specified timezone."
     }
   ],
   "user_config": {

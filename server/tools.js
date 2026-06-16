@@ -79,6 +79,7 @@ export function get_current_date_local(timezone) {
 }
 
 const apiTools = [
+    // AI IMPACT
     new ApiTool({
         name: "ai_company_adoption_analytics",
         description: "Returns per-tool AI adoption analytics aggregated across the entire company, including cohort counts and average usage percentage.",
@@ -177,35 +178,6 @@ const apiTools = [
             required: ["team_id"]
         },
         endpoint: "/endpoints/export/v0/ai_impact/team_adoption_analytics"
-    }),
-
-    new ApiTool({
-        name: "search_articles",
-        description: "Search Jellyfish help center articles using full-text search. Handles natural language queries. Note: the help center covers a limited set of topics and may not have articles for every question.",
-        inputSchema: {
-            type: "object",
-            properties: {
-                query: { type: "string", description: "Search query - can be natural language (e.g., 'How do I set up GitHub Copilot?')." }
-            },
-            required: ["query"]
-        },
-        endpoint: "/endpoints/export/v0/mcp/help_center/search"
-    }),
-
-    new ApiTool({
-        name: "get_article",
-        description: "Retrieve full content of a specific Jellyfish help center article by ID.",
-        inputSchema: {
-            type: "object",
-            properties: {
-                article_id: { type: "integer", description: "Help center article ID" }
-            },
-            required: ["article_id"]
-        },
-        // override call to handle dynamic endpoint with article_id
-        call({ article_id, ...rest }) {
-            return api_generic(`/endpoints/export/v0/mcp/help_center/article/${article_id}`, rest);
-        }
     }),
 
     // ALLOCATIONS
@@ -694,6 +666,36 @@ const apiTools = [
             required: []
         },
         endpoint: "/endpoints/export/v0/teams/search"
+    }),
+
+    // HELP CENTER
+    new ApiTool({
+        name: "search_articles",
+        description: "Search Jellyfish help center articles using full-text search. Handles natural language queries. Note: the help center covers a limited set of topics and may not have articles for every question.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                query: { type: "string", description: "Search query - can be natural language (e.g., 'How do I set up GitHub Copilot?')." }
+            },
+            required: ["query"]
+        },
+        endpoint: "/endpoints/export/v0/mcp/help_center/search"
+    }),
+
+    new ApiTool({
+        name: "get_article",
+        description: "Retrieve full content of a specific Jellyfish help center article by ID.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                article_id: { type: "integer", description: "Help center article ID" }
+            },
+            required: ["article_id"]
+        },
+        // override call to handle dynamic endpoint with article_id
+        call({ article_id, ...rest }) {
+            return api_generic(`/endpoints/export/v0/mcp/help_center/article/${article_id}`, rest);
+        }
     }),
 ];
 
