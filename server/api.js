@@ -119,10 +119,7 @@ export async function api_generic(endpoint, params = {}) {
 
             // Try to parse and format JSON errors
             try {
-                const errorJson = JSON.parse(errorText);
-                message = Object.entries(errorJson)
-                    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
-                    .join('\n');
+                message = JSON.stringify(JSON.parse(errorText));
             } catch {
                 // Not JSON, keep as-is
             }
