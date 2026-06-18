@@ -1,6 +1,6 @@
 {
   "name": "jellyfish-mcp-server",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Connect to your Jellyfish Software Engineering Intelligence platform for comprehensive team insights, effort allocation, and delivery metrics.",
   "keywords": [
     "jellyfish",

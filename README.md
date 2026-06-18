@@ -99,7 +99,7 @@ The server provides several tools for interacting with the Jellyfish API. Each t
 
 ## Skills
 
-In addition to the MCP tools above, the Jellyfish MCP pairs with optional Agent Skills. Skills can similarly be invoked throughout the chat conversation, but are not bundled with the MCP and need to be independently installed. To install, go to the [`skills/`](skills/) directory and add each Skill individually to your host application.
+In addition to the MCP tools above, the Jellyfish MCP pairs with optional Agent Skills. Skills can similarly be invoked throughout the chat conversation, but are not bundled with the MCP and need to be independently installed. To install a skill in Claude Desktop, download its `.skill` file from the [latest release](https://github.com/Jellyfish-AI/jellyfish-mcp/releases) and double-click to install. For other host applications, install the skill directly from the [`skills/`](skills/) directory.
 
 > **Security note:** Skills may ask the LLM to author HTML directly, building it from data returned by the Jellyfish API. Because the HTML is generated rather than fixed, using a skill means trusting that the data Jellyfish returns and the HTML the model builds from it are both safe to render. If that trust is misplaced, a skill could produce dangerous output, including HTML or JavaScript that the user did not intend. Skills are entirely optional and are installed separately, so anyone who would rather not take on this assumption can simply leave them uninstalled. See [`SECURITY.md`](SECURITY.md) for the full discussion.
 
