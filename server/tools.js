@@ -37,7 +37,7 @@ class ApiTool {
      * when the endpoint URL requires dynamic path parameters.
      */
     async call(params) {
-        return api_generic(this._endpoint, params);
+        return api_generic(this._endpoint, params, this.name);
     }
 }
 
@@ -434,7 +434,7 @@ const apiTools = [
             required: ["deliverable_id"]
         },
         call({ deliverable_id, ...rest }) {
-            return api_generic(`/endpoints/export/v0/mcp/get_deliverable/${deliverable_id}`, rest);
+            return api_generic(`/endpoints/export/v0/mcp/get_deliverable/${deliverable_id}`, rest, this.name);
         }
     }),
 
@@ -667,7 +667,7 @@ const apiTools = [
         },
         // override call to handle dynamic endpoint with article_id
         call({ article_id, ...rest }) {
-            return api_generic(`/endpoints/export/v0/mcp/help_center/article/${article_id}`, rest);
+            return api_generic(`/endpoints/export/v0/mcp/help_center/article/${article_id}`, rest, this.name);
         }
     }),
 ];

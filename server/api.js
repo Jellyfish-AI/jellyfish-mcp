@@ -3,6 +3,7 @@ import yaml from 'js-yaml';
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { buildOutboundHeaders } from './meta.js';
 
 // Get version from package.json
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +30,7 @@ const HEADERS = {
 // Function to fetch and process the schema
 async function fetch_schema() {
     try {
-        const response = await fetch(SCHEMA_URL, { headers: HEADERS });
+        const response = await fetch(SCHEMA_URL, { headers: buildOutboundHeaders(HEADERS) });
 
         if (response.ok) {
             const responseText = await response.text();
@@ -85,7 +86,7 @@ export async function api_list_endpoints() {
 }
 
 // --- GENERIC API CALL FUNCTION ---
-export async function api_generic(endpoint, params = {}) {
+export async function api_generic(endpoint, params = {}, toolName = null) {
     const url = new URL(endpoint, API_BASE_URL);
 
     // We always parse responses as JSON (response.json() below), so force
@@ -108,7 +109,7 @@ export async function api_generic(endpoint, params = {}) {
     });
 
     try {
-        const response = await fetch(url, { headers: HEADERS });
+        const response = await fetch(url, { headers: buildOutboundHeaders(HEADERS, { toolName }) });
 
         if (response.ok) {
             const data = await response.json();
