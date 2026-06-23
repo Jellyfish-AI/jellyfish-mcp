@@ -11,9 +11,11 @@ import {
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import * as api from "./api.js";
 import { ApiToolRegistry, get_current_date_local } from "./tools.js";
 import { encode } from '@toon-format/toon';
 import { sanitize_api_response } from './sanitizer.js';
+import { attachInitializeCapture } from './mcp_context.js';
 import { SERVER_INSTRUCTIONS } from './instructions.js';
 
 // Get version from package.json
@@ -36,6 +38,8 @@ const server = new Server(
         instructions: SERVER_INSTRUCTIONS
     }
 );
+
+attachInitializeCapture(server, { transport: 'stdio' });
 
 // Helper function to filter out undefined/null/empty array values from parameters
 function filter_params(params) {
