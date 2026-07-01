@@ -86,10 +86,13 @@ Run `claude mcp list` to verify.
 
 ### Cursor
 
-1. Open _Cursor Settings_ (_Cursor_ → _Settings..._ → _Cursor Settings_ on macOS).
-2. Go to _Tools & MCP_ → _Add Custom MCP_.
+1. Open _Cursor Settings_ (_Cursor_ → _Preferences_ → _Cursor Settings_ on macOS).
+2. Go to _Tools & MCPs_ → _Add Custom MCP_.
+3. Add to `mcp.json`:
 
-**npx** — requires Node.js v18 or later. Add to `mcp.json`:
+**npx** — requires Node.js v18 or later.
+
+> Cursor runs its own isolated bash environment so it does not have access to the location of npx because it does not inherit your terminal's environment variables (like PATH). Depending on how Node is installed, `"command": "npx"` may fail to connect.
 
 ```json
 {
@@ -97,6 +100,25 @@ Run `claude mcp list` to verify.
     "jellyfish-mcp": {
       "command": "npx",
       "args": ["-y", "jellyfish-mcp-server@latest"],
+      "env": {
+        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+        "MODEL_AVAILABILITY": "false",
+        "MODEL_TIMEOUT": "10"
+      }
+    }
+  }
+}
+```
+
+If it fails to connect (common with a Node version manager), point `command` directly at your `node` binary and pass `npx` as the first arg. Find both with `which node` and `which npx`. Note: these paths may include your Node version, so this can break when you upgrade Node. If you'd rather not manage paths, use Docker below.
+
+```json
+{
+  "mcpServers": {
+    "jellyfish-mcp": {
+      "command": "path/to/node",
+      "args": ["path/to/npx", "-y", "jellyfish-mcp-server@latest"],
       "env": {
         "JELLYFISH_API_TOKEN": "your_jellyfish_token",
         "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
@@ -195,5 +217,6 @@ Run `claude mcp list` to verify.
 - Ensure your Jellyfish instance is reachable from your machine.
 - For npx, confirm Node.js v18 or later is installed: `node --version`.
 - For npx, make sure you're on the latest release by using the `@latest` tag: `npx -y jellyfish-mcp-server@latest`.
+- In Cursor, if the server fails to connect with an error like `ENOENT ... /Applications/Cursor.app/.../resources/lib`, Cursor is falling back to its own bundled Node instead of yours (it doesn't inherit your terminal's `PATH`). This is common with a Node version manager (mise/nvm/asdf). Fix it by pointing `command` directly at your `node` binary and passing `npx` as the first arg — see above in the [Cursor](#cursor) setup.
 - For Docker, confirm Docker is running: `docker info`.
 - If PromptGuard is unexpectedly blocking responses, set `MODEL_AVAILABILITY=true` to allow data through when PromptGuard can't be reached, or unset `HUGGINGFACE_API_TOKEN` to disable PromptGuard entirely.
