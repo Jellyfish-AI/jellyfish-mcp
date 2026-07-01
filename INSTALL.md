@@ -85,17 +85,24 @@ claude mcp add jellyfish-mcp \
 Run `claude mcp list` to verify.
 
 ### Cursor
+> Cursor runs its own isolated bash environment so it does not have access to the location of npx
+> because it does not inherit your terminal's environment variables (like PATH)
 
+**Before configuration**
+* Ensure that `npx` is installed. (`npx -v`) **npx** — requires Node.js v18 or later. 
+* Find the path to your npx installation (Bash example: `which npx`)
+
+**Configuration** 
 1. Open _Cursor Settings_ (_Cursor_ → _Settings..._ → _Cursor Settings_ on macOS).
 2. Go to _Tools & MCP_ → _Add Custom MCP_.
 
-**npx** — requires Node.js v18 or later. Add to `mcp.json`:
+Add to `mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "jellyfish-mcp": {
-      "command": "npx",
+      "command": "path/to/npx",
       "args": ["-y", "jellyfish-mcp-server@latest"],
       "env": {
         "JELLYFISH_API_TOKEN": "your_jellyfish_token",
