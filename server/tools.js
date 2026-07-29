@@ -31,12 +31,28 @@ class ApiTool {
         };
     }
 
+    _validateEnums(params) {
+        const errors = [];
+        const props = this.inputSchema?.properties || {};
+        for (const [key, value] of Object.entries(params)) {
+            const schema = props[key];
+            if (schema?.enum && !schema.enum.includes(value)) {
+                errors.push(`Invalid value "${value}" for "${key}". Valid values: ${schema.enum.join(', ')}`);
+            }
+        }
+        return errors;
+    }
+
     /**
      * Executes the tool by calling the Jellyfish API.
      * Override by passing a `call` function in the constructor
      * when the endpoint URL requires dynamic path parameters.
      */
     async call(params) {
+        const errors = this._validateEnums(params);
+        if (errors.length) {
+            return { error: 'Invalid parameters', message: errors.join('\n') };
+        }
         return api_generic(this._endpoint, params, this.name);
     }
 }
@@ -88,7 +104,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" }
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" }
             },
             required: []
         },
@@ -103,7 +119,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" }
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" }
             },
             required: []
         },
@@ -118,7 +134,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 person_id: { type: "array", items: { type: "integer" }, description: "List of person IDs" }
             },
             required: ["person_id"]
@@ -134,7 +150,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 person_id: { type: "array", items: { type: "integer" }, description: "List of person IDs" }
             },
             required: ["person_id"]
@@ -150,7 +166,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 team_id: { type: "array", items: { type: "integer" }, description: "List of Jellyfish team IDs" }
             },
             required: ["team_id"]
@@ -166,7 +182,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 team_id: { type: "array", items: { type: "integer" }, description: "List of team IDs" }
             },
             required: ["team_id"]
@@ -183,7 +199,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -202,7 +218,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -223,7 +239,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -242,7 +258,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -261,7 +277,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -282,7 +298,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -302,7 +318,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -322,7 +338,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -355,7 +371,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\", \"sprint\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week", "sprint"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -378,7 +394,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\", \"sprint\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week", "sprint"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 decimal_places: { type: "integer", description: "Show FTE amounts rounded to this many decimal places (1 to 3). Defaults to 1." },
                 include_below_threshold_card_keys: { type: "boolean", description: "Include allocated card keys that round to 0 FTE. Omit when using max_n_allocation_card_keys (default true works well). Set to false when omitting max_n_allocation_card_keys to limit excessive data volume from minor allocations." },
@@ -404,7 +420,7 @@ const apiTools = [
                 deliverable_id: { type: "integer", description: "Jellyfish deliverable id" },
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" }
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" }
             },
             required: ["deliverable_id"]
         },
@@ -486,7 +502,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 id: { type: "integer", description: "Jellyfish team id" },
                 devex_team_ref: { type: "string", description: "Unique identifier for a team in DevEx" },
                 team_id: { type: "integer", description: "Jellyfish team id" },
@@ -507,7 +523,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" }
             },
             required: []
@@ -523,7 +539,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 person_id: { type: "array", items: { type: "integer" }, description: "List of person IDs" }
             },
@@ -540,7 +556,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\", \"sprint\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week", "sprint"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 team_id: { type: "array", items: { type: "integer" }, description: "List of team IDs" }
             },
@@ -572,7 +588,7 @@ const apiTools = [
             properties: {
                 start_date: { type: "string", description: "Start date (YYYY-MM-DD)" },
                 end_date: { type: "string", description: "End date (YYYY-MM-DD)" },
-                unit: { type: "string", description: "Time unit (\"quarter\", \"month\", \"week\")" },
+                unit: { type: "string", enum: ["quarter", "month", "week"], description: "Time unit" },
                 series: { type: "boolean", description: "Whether to return series data" },
                 instance_slug: { type: "array", items: { type: "string" }, description: "List of git instance slugs" },
                 organization_name: { type: "array", items: { type: "string" }, description: "List of organization names" },

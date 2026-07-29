@@ -308,3 +308,92 @@ describe('Sanitizer Module', async () => {
 });
 
 
+// ============================================================================
+// ENUM VALIDATION TESTS (server/tools.js - ApiTool._validateEnums)
+// Tests that enum-constrained parameters are validated before API calls
+// ============================================================================
+
+describe('Enum Validation', async () => {
+  let originalEnv;
+  let originalFetch;
+
+  beforeEach(() => {
+    originalEnv = process.env.JELLYFISH_API_TOKEN;
+    originalFetch = global.fetch;
+    process.env.JELLYFISH_API_TOKEN = 'test_token';
+  });
+
+  afterEach(() => {
+    process.env.JELLYFISH_API_TOKEN = originalEnv;
+    global.fetch = originalFetch;
+  });
+
+  it('should reject invalid enum value with helpful error', async () => {
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('company_metrics');
+
+    const result = await tool.call({ unit: 'weekly', start_date: '2026-01-01' });
+
+    assert.ok(result.error, 'Should return an error');
+    assert.ok(result.message.includes('"weekly"'), 'Should mention the invalid value');
+    assert.ok(result.message.includes('quarter'), 'Should list valid values');
+    assert.ok(result.message.includes('month'), 'Should list valid values');
+    assert.ok(result.message.includes('week'), 'Should list valid values');
+  });
+
+  it('should accept valid enum value and call API', async () => {
+    global.fetch = mock.fn(async () => ({
+      ok: true,
+      json: async () => ({ data: [] })
+    }));
+
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('company_metrics');
+
+    const result = await tool.call({ unit: 'week', start_date: '2026-01-01' });
+
+    assert.ok(!result.error, 'Should not return an error');
+    assert.strictEqual(global.fetch.mock.calls.length, 1, 'Should have called the API');
+  });
+
+  it('should not validate params without enum constraints', async () => {
+    global.fetch = mock.fn(async () => ({
+      ok: true,
+      json: async () => ({ data: [] })
+    }));
+
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('company_metrics');
+
+    const result = await tool.call({ start_date: 'not-a-real-date', unit: 'week' });
+
+    assert.ok(!result.error, 'Should not validate non-enum fields');
+    assert.strictEqual(global.fetch.mock.calls.length, 1, 'Should have called the API');
+  });
+
+  it('should accept sprint as valid for team_metrics', async () => {
+    global.fetch = mock.fn(async () => ({
+      ok: true,
+      json: async () => ({ data: [] })
+    }));
+
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('team_metrics');
+
+    const result = await tool.call({ unit: 'sprint', team_id: [1] });
+
+    assert.ok(!result.error, 'Should accept sprint for team_metrics');
+    assert.strictEqual(global.fetch.mock.calls.length, 1, 'Should have called the API');
+  });
+
+  it('should reject sprint for tools that only support quarter/month/week', async () => {
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('company_metrics');
+
+    const result = await tool.call({ unit: 'sprint' });
+
+    assert.ok(result.error, 'Should return an error');
+    assert.ok(result.message.includes('"sprint"'), 'Should mention the invalid value');
+  });
+});
+
