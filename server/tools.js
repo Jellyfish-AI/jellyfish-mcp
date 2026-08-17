@@ -11,11 +11,12 @@ class ApiTool {
      * For tools with dynamic endpoints (e.g. path params), override `call`:
      *   new ApiTool({ name, description, inputSchema, call(params) { ... } })
     */
-    constructor({ name, description, inputSchema, endpoint, call }) {
+    constructor({ name, description, inputSchema, endpoint, call, responseNote }) {
         this.name = name;
         this.description = description;
         this.inputSchema = inputSchema;
         this._endpoint = endpoint;
+        this.responseNote = responseNote;
         if (call) this.call = call;
     }
 
@@ -53,7 +54,11 @@ class ApiTool {
         if (errors.length) {
             return { error: 'Invalid parameters', message: errors.join('\n') };
         }
-        return api_generic(this._endpoint, params, this.name);
+        const result = await api_generic(this._endpoint, params, this.name);
+        if (this.responseNote && !result?.error) {
+            return { ...result, scoping_note: this.responseNote };
+        }
+        return result;
     }
 }
 
@@ -550,7 +555,7 @@ const apiTools = [
 
     new ApiTool({
         name: "team_metrics",
-        description: "Returns metrics data for the specified team during the specified timeframe.",
+        description: "Returns metrics data for the specified team during the specified timeframe. Note: pull-request-derived figures (e.g. merged PR counts) are scoped to PRs linked to a Jira ticket that resolves to the team — PRs merged without a resolving ticket link are not included.",
         inputSchema: {
             type: "object",
             properties: {
@@ -562,7 +567,8 @@ const apiTools = [
             },
             required: ["team_id"]
         },
-        endpoint: "/endpoints/export/v0/metrics/team_metrics"
+        endpoint: "/endpoints/export/v0/metrics/team_metrics",
+        responseNote: "Pull-request-derived figures in this response (e.g. merged PR counts) only include PRs linked to a Jira ticket that resolves to this team."
     }),
 
     new ApiTool({
