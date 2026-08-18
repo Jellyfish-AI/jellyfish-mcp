@@ -397,3 +397,66 @@ describe('Enum Validation', async () => {
   });
 });
 
+describe('Jira-linked PR Scoping Disclosure', async () => {
+  let originalEnv;
+  let originalFetch;
+
+  beforeEach(() => {
+    originalEnv = process.env.JELLYFISH_API_TOKEN;
+    originalFetch = global.fetch;
+    process.env.JELLYFISH_API_TOKEN = 'test_token';
+  });
+
+  afterEach(() => {
+    process.env.JELLYFISH_API_TOKEN = originalEnv;
+    global.fetch = originalFetch;
+  });
+
+  it('should mention Jira-linked PR scoping in the team_metrics description', async () => {
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('team_metrics');
+
+    assert.ok(tool.description.includes('Jira ticket'), 'Description should mention Jira ticket linkage');
+  });
+
+  it('should attach a scoping_note to a successful team_metrics response', async () => {
+    global.fetch = mock.fn(async () => ({
+      ok: true,
+      json: async () => ({ data: [] })
+    }));
+
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('team_metrics');
+
+    const result = await tool.call({ team_id: [1] });
+
+    assert.ok(!result.error, 'Should not return an error');
+    assert.ok(result.scoping_note, 'Should include a scoping_note field');
+    assert.ok(result.scoping_note.includes('Jira ticket'), 'scoping_note should mention Jira ticket linkage');
+  });
+
+  it('should not attach a scoping_note when team_metrics returns an error', async () => {
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('team_metrics');
+
+    const result = await tool.call({ unit: 'invalid' });
+
+    assert.ok(result.error, 'Should return an error');
+    assert.ok(!('scoping_note' in result), 'Should not attach scoping_note on error');
+  });
+
+  it('should not attach a scoping_note to tools without a responseNote configured', async () => {
+    global.fetch = mock.fn(async () => ({
+      ok: true,
+      json: async () => ({ data: [] })
+    }));
+
+    const { ApiToolRegistry } = await import('../server/tools.js');
+    const tool = ApiToolRegistry.lookup('company_metrics');
+
+    const result = await tool.call({ unit: 'week' });
+
+    assert.ok(!('scoping_note' in result), 'company_metrics should not have a scoping_note');
+  });
+});
+
