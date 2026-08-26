@@ -51,11 +51,14 @@
     "SECURITY.md"
   ],
   "scripts": {
-    "test": "node --test tests/test_server.js"
+    "test": "node --test tests/test_server.js",
+    "validate:frontmatter": "node scripts/validate-skill-frontmatter.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.23.0",
-    "@toon-format/toon": "^2.0.0",
+    "@toon-format/toon": "^2.0.0"
+  },
+  "devDependencies": {
     "js-yaml": "^4.1.0"
   }
 }
