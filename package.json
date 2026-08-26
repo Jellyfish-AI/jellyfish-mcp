@@ -56,9 +56,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.23.0",
-    "@toon-format/toon": "^2.0.0"
-  },
-  "devDependencies": {
+    "@toon-format/toon": "^2.0.0",
     "js-yaml": "^4.1.0"
   }
 }
