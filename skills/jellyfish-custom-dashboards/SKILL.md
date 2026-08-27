@@ -1,6 +1,7 @@
 ---
 name: jellyfish-custom-dashboards
-description: Build branded dashboards and reports from Jellyfish engineering analytics. Use this skill whenever the user asks for a dashboard, report, or visual summary involving Jellyfish data. Also use for diagnostic questions like "where is effort going", "how are we tracking", or "show me the data". Currently supports: engineering investment.
+description: >
+  Build branded dashboards and reports from Jellyfish engineering analytics. Use this skill whenever the user asks for a dashboard, report, or visual summary involving Jellyfish data. Also use for diagnostic questions like "where is effort going", "how are we tracking", or "show me the data". Currently supports: engineering investment.
 metadata:
   author: Jellyfish
   version: 1.0.0
