@@ -32,6 +32,8 @@ export function attachInitializeCapture(server, { transport = null } = {}) {
 
 export function getProcessContext(toolName = null) {
   return {
+    'mcp.server.name': 'jellyfish-mcp',
+    'mcp.server.generation': 1,
     'mcp.client.name': _clientName,
     'mcp.client.version': _clientVersion,
     'mcp.protocol.version': _protocolVersion,
