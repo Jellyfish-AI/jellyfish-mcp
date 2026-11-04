@@ -460,3 +460,14 @@ describe('Jira-linked PR Scoping Disclosure', async () => {
   });
 });
 
+
+describe('Outbound MCP Meta Header', async () => {
+  it('should send the server name and a numeric generation in the header', async () => {
+    const { buildOutboundHeaders, HEADER_NAME } = await import('../server/meta.js');
+    const headers = buildOutboundHeaders({});
+    const meta = JSON.parse(headers[HEADER_NAME]);
+
+    assert.strictEqual(meta['mcp.server.name'], 'jellyfish-mcp');
+    assert.strictEqual(typeof meta['mcp.server.generation'], 'number');
+  });
+});
