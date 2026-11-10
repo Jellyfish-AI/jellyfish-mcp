@@ -38,6 +38,7 @@ Pick the section that matches the client you're using.
 - [Claude Code](#claude-code) — npx or Docker
 - [Cursor](#cursor) — npx or Docker
 - [VSCode](#vscode) — npx or Docker
+- [Kiro](#kiro) — npx
 
 > **npx or Docker?** Use npx unless you specifically prefer Docker — it's smaller, faster, and the config is shorter. Pick Docker if you already use it for tooling, your environment can't install Node.js, or you want container isolation. To run from a local clone instead, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
@@ -211,6 +212,40 @@ If it fails to connect (common with a Node version manager), point `command` dir
 
 > **Docker note:** each variable must also be passed through with `-e VARNAME` in `args` — values placed only in the `env` block are not forwarded into the container. Keep each `--flag value` pair together and list all `-e` flags before the image name.
 
+### Kiro
+
+Kiro supports local (stdio) MCP servers through an `mcp.json` file. See the [Kiro MCP docs](https://kiro.dev/docs/mcp/configuration/) for details.
+
+1. Open a folder in Kiro (**File → Open Folder**). The MCP servers list in the Kiro panel only appears once a project is open.
+2. Open the _Command Palette_ (Cmd/Ctrl+Shift+P) and run one of:
+   - _Kiro: Open user MCP config (JSON)_ — `~/.kiro/settings/mcp.json`, available in every workspace.
+   - _Kiro: Open workspace MCP config (JSON)_ — `.kiro/settings/mcp.json`, available only in the current workspace.
+3. Add the `jellyfish-mcp` server inside `mcpServers` (use the block below) and save. Kiro reconnects automatically.
+4. Click the Ghost icon in the activity bar to open the Kiro panel, and confirm `jellyfish-mcp` shows as connected in the MCP servers list.
+
+**npx** — requires Node.js v18 or later.
+
+```json
+{
+  "mcpServers": {
+    "jellyfish-mcp": {
+      "command": "npx",
+      "args": ["-y", "jellyfish-mcp-server@latest"],
+      "env": {
+        "JELLYFISH_API_TOKEN": "your_jellyfish_token",
+        "HUGGINGFACE_API_TOKEN": "your_huggingface_token",
+        "MODEL_AVAILABILITY": "false",
+        "MODEL_TIMEOUT": "10"
+      }
+    }
+  }
+}
+```
+
+> **Keeping tokens out of the file:** Kiro expands `${VAR_NAME}` in `env` values, for example `"JELLYFISH_API_TOKEN": "${JELLYFISH_API_TOKEN}"`. Kiro only expands variables you have approved (it warns about unapproved ones), and the variable must be set in the environment Kiro was launched from. On macOS, launch Kiro from a terminal (`kiro .`) to be sure it inherits your shell environment.
+>
+> If your organization uses Kiro's registry mode, a server defined in `mcp.json` only runs if its name matches a registry entry. Ask your Kiro admin.
+
 ## Troubleshooting
 
 - Verify your `JELLYFISH_API_TOKEN` is correct and has the necessary permissions.
@@ -218,5 +253,6 @@ If it fails to connect (common with a Node version manager), point `command` dir
 - For npx, confirm Node.js v18 or later is installed: `node --version`.
 - For npx, make sure you're on the latest release by using the `@latest` tag: `npx -y jellyfish-mcp-server@latest`.
 - In Cursor, if the server fails to connect with an error like `ENOENT ... /Applications/Cursor.app/.../resources/lib`, Cursor is falling back to its own bundled Node instead of yours (it doesn't inherit your terminal's `PATH`). This is common with a Node version manager (mise/nvm/asdf). Fix it by pointing `command` directly at your `node` binary and passing `npx` as the first arg — see above in the [Cursor](#cursor) setup.
+- In Kiro, if the server doesn't connect, open the Kiro panel's _Output_ tab and choose _Kiro - MCP Logs_. If `npx` isn't found, launch Kiro from a terminal (`kiro .`) so it inherits your `PATH`, or see the Node path workaround in the [Cursor](#cursor) section.
 - For Docker, confirm Docker is running: `docker info`.
 - If PromptGuard is unexpectedly blocking responses, set `MODEL_AVAILABILITY=true` to allow data through when PromptGuard can't be reached, or unset `HUGGINGFACE_API_TOKEN` to disable PromptGuard entirely.
